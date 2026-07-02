@@ -1,0 +1,64 @@
+{
+  "common": {
+    "site": "my-awesome-project",
+    "theme": "light",
+    "brandFont": ["system-ui", "sans-serif"],
+    "siteName": "My Awesome Project",
+    "headerMenu": "header-default",
+    "footer": "footer-default",
+    "showSidebar": true,
+    "sidebar": "sidebar-default",
+    "navbarBrandLogo": "/assets/images/logo.png",
+    "navbarBrandText": "<span class=\"fw-bold\">My Awesome</span> Project",
+    "navbarBrandLink": "/project",
+    "ogImage": "/assets/images/social-preview.jpg"
+  },
+
+  "/project": {
+    "view": "pages/project/overview",
+    "title": "Home | My Awesome Project",
+    "ogTitle": "Welcome to My Awesome Project",
+    "ogDescription": "This is the landing page for my custom site built on the Stardust Engine CMS.",
+    "showSidebar": false
+  },
+
+  "/project/about": {
+    "view": "pages/project/about/overview",
+    "title": "About Us | My Awesome Project",
+    "ogTitle": "About Our Team",
+    "schemaType": "Organization"
+  },
+
+  "/project/about/history": {
+    "view": "pages/project/about/history",
+    "title": "Our History | My Awesome Project",
+    "ogTitle": "Our History - How It Started"
+  },
+
+  "/project/portfolio": {
+    "view": "pages/project/portfolio/overview",
+    "title": "Portfolio | My Awesome Project",
+    "ogTitle": "Our Work",
+    "showSidebar": false
+  },
+
+  "/project/portfolio/alpha-launch": {
+    "view": "pages/project/portfolio/alpha-launch",
+    "title": "Project Alpha (2025) | My Awesome Project",
+    "ogTitle": "Project Alpha - The Beginning",
+    "ogImage": "/assets/images/portfolio/alpha-social.jpg",
+    "schemaType": "CreativeWork",
+    "narrativeReleaseDate": "2025",
+    "realReleaseDate": "2026-01-15"
+  },
+
+  "/project/portfolio/beta-release": {
+    "view": "pages/project/portfolio/beta-release",
+    "title": "Project Beta (2026) | My Awesome Project",
+    "ogTitle": "Project Beta - The Next Step",
+    "ogImage": "/assets/images/portfolio/beta-social.jpg",
+    "schemaType": "CreativeWork",
+    "narrativeReleaseDate": "2026",
+    "realReleaseDate": "2026-06-01"
+  }
+}

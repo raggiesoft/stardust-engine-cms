@@ -1,0 +1,98 @@
+/* ==========================================================================
+ * VISUAL FX & EXTRAS
+ * Glows, HUD panels, and UI enhancements
+ * ========================================================================== */
+
+/* --- Text & Box Glows --- */
+.text-glow-primary {
+    background: linear-gradient(45deg, var(--bs-primary), var(--bs-info));
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    filter: drop-shadow(0 0 2px rgba(var(--bs-primary-rgb), 0.3));
+}
+
+.border-glow {
+    border: 1px solid rgba(var(--bs-primary-rgb), 0.5) !important;
+    box-shadow: 0 0 15px rgba(var(--bs-primary-rgb), 0.15);
+}
+
+.shadow-glow {
+    box-shadow: 0 5px 15px rgba(var(--bs-primary-rgb), 0.25);
+}
+
+/* --- The Glass HUD System --- */
+/* Semi-transparent colored glass that forces light text globally */
+
+.bg-hud-blue {
+    background-color: rgba(var(--bs-info-rgb), 0.15);
+    border: 1px solid rgba(var(--bs-info-rgb), 0.3);
+    backdrop-filter: blur(5px);
+    color: #ffffff !important;
+}
+
+.bg-hud-green {
+    background-color: rgba(var(--bs-success-rgb), 0.15);
+    border: 1px solid rgba(var(--bs-success-rgb), 0.3);
+    backdrop-filter: blur(5px);
+    color: #ffffff !important;
+}
+
+.bg-hud-red {
+    background-color: rgba(var(--bs-danger-rgb), 0.15);
+    border: 1px solid rgba(var(--bs-danger-rgb), 0.3);
+    backdrop-filter: blur(5px);
+    color: #ffffff !important;
+}
+
+.bg-hud-orange {
+    background-color: rgba(var(--bs-warning-rgb), 0.15);
+    border: 1px solid rgba(var(--bs-warning-rgb), 0.3);
+    backdrop-filter: blur(5px);
+    color: #ffffff !important;
+}
+
+/* Force muted text inside HUDs to remain readable */
+.bg-hud-blue .text-muted, .bg-hud-green .text-muted, 
+.bg-hud-red .text-muted, .bg-hud-orange .text-muted {
+    color: rgba(255, 255, 255, 0.7) !important; 
+}
+
+/* --- Bootstrap Utilities Backfill --- */
+/* Restores proper citation styling for quotes */
+.blockquote-footer {
+    display: block;
+    font-size: 0.875em;
+    margin-top: -1rem;
+    margin-bottom: 1rem;
+    font-family: inherit; 
+    opacity: 0.8;
+}
+.blockquote-footer::before {
+    content: "\2014\00A0"; 
+}
+
+/* --- UI Component: Data Pills --- */
+.data-pill {
+    display: inline-flex;
+    align-items: center;
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 0.4em 0.85em;
+    margin-right: 0.35rem;
+    margin-bottom: 0.35rem;
+    background-color: rgba(128, 128, 128, 0.05);
+    border: 1px solid var(--bs-border-color);
+    color: var(--bs-body-color);
+    border-radius: 50rem;
+    transition: all 0.2s ease;
+    cursor: default;
+}
+.data-pill:hover {
+    background-color: rgba(var(--bs-primary-rgb), 0.1);
+    border-color: var(--bs-primary);
+    transform: translateY(-1px);
+    color: var(--bs-primary);
+}

@@ -1,0 +1,28 @@
+/* ==========================================================================
+ * SAFETY NET
+ * Fallback typography and critical dark mode contrast fixes
+ * ========================================================================== */
+
+/* Typography Baseline */
+body {
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+h1, h2, h3, h4, h5, h6, .navbar-brand, .display-1, .display-2, .display-3, .display-4 {
+    font-family: inherit;
+    font-weight: 700;
+}
+
+/* Dark Mode Component Fixes */
+@media (prefers-color-scheme: dark) {
+  .text-body { color: var(--bs-body-color) !important; }
+  .text-muted { color: var(--bs-secondary) !important; }
+  .bg-light { background-color: var(--bs-tertiary-bg) !important; color: var(--bs-body-color); }
+  
+  /* Fix button outlines on dark backgrounds */
+  .btn-outline-secondary { color: #e0e0e0; border-color: #adb5bd; }
+  .btn-outline-secondary:hover { background-color: #adb5bd; color: #121212; }
+}
+
+[data-bs-theme="dark"] .text-body { color: var(--bs-body-color) !important; }
+[data-bs-theme="dark"] .text-muted { color: var(--bs-secondary) !important; }
+[data-bs-theme="dark"] .bg-light { background-color: var(--bs-tertiary-bg) !important; color: var(--bs-body-color); }

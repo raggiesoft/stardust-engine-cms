@@ -1,0 +1,63 @@
+server {
+    listen 80;
+    server_name example.com www.example.com;
+    root /var/www/example.com;
+
+    # LOGS
+    access_log /var/log/nginx/stardust_access.log;
+    error_log /var/log/nginx/stardust_error.log;
+
+    # PRIORITY 1: The Custom Router
+    # SECURITY TARGET: Rename this directory and file!
+    index [RENAME_THIS_DIR]/[RENAME_THIS_ROUTER].php;
+
+    # Security: Prevent viewing dotfiles
+    location ~ /\. {
+        deny all;
+    }
+
+    # >>> STARDUST ENGINE: APP LOGIC GATEWAY <<<
+    location ^~ /includes/components/apps/ {
+        try_files $uri $uri/ =404;
+
+        location ~ \.php$ {
+            include snippets/fastcgi-php.conf;
+            fastcgi_pass unix:/var/run/php/php8.5-fpm.sock;
+            fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+            include fastcgi_params;
+        }
+    }
+
+    # DENY: Internal Components
+    location ^~ /includes/ {
+        deny all;
+        return 404;
+    }
+
+    # MAIN LOCATION BLOCK
+    # SECURITY TARGET: Update this fallback route!
+    location / {
+        try_files $uri $uri/ /[RENAME_THIS_DIR]/[RENAME_THIS_ROUTER].php?$query_string;
+    }
+
+    # PHP PROCESSING (Global)
+    location ~ \.php$ {
+        include snippets/fastcgi-php.conf;
+        fastcgi_pass unix:/var/run/php/php8.5-fpm.sock;
+        fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+        include fastcgi_params;
+    }
+
+    # CUSTOM ERROR PAGES
+    # SECURITY TARGET: Update these paths to match your renamed directory!
+    error_page 403 /[RENAME_THIS_DIR]/errors/403.php;
+    error_page 404 /[RENAME_THIS_DIR]/errors/404.php;
+    error_page 500 /[RENAME_THIS_DIR]/errors/500.php;
+    error_page 502 /[RENAME_THIS_DIR]/errors/502.php;
+    error_page 503 /[RENAME_THIS_DIR]/errors/503.php;
+    error_page 504 /[RENAME_THIS_DIR]/errors/504.php;
+
+    location ^~ /[RENAME_THIS_DIR]/errors/ {
+        internal; 
+    }
+}

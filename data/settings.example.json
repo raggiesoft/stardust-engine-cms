@@ -1,0 +1,47 @@
+{
+  "siteName": "Stardust Engine CMS",
+  "projectSlug": "my-awesome-project",
+  "cdnBaseUrl": "https://cdn.example.com",
+  "defaultTheme": "light",
+  "forceDarkThemes": [
+    "dark",
+    "space-theme",
+    "terminal"
+  ],
+  "activeModules": [
+    "stardust-player"
+  ],
+  "brandFont": [
+    "system-ui",
+    "-apple-system",
+    "sans-serif"
+  ],
+  "analytics": {
+    "provider": "google",
+    "trackingId": "G-XXXXXXXXXX",
+    "enabled": false
+  },
+  "defaults": {
+    "view": "errors/404",
+    "showSidebar": false,
+    "sidebar": "sidebar-default",
+    "ogTitle": "Stardust Engine CMS",
+    "ogDescription": "A blazing-fast, headless-capable Content Management System.",
+    "ogImage": "/assets/images/social-preview.jpg",
+    "navbarBrandLogo": "/assets/images/logo.png",
+    "navbarBrandLogoDark": "/assets/images/logo-dark.png",
+    "navbarBrandText": "Stardust Engine",
+    "navbarBrandLink": "/",
+    "navbarBrandAlt": "Site Logo",
+    "navbarBrandClass": "rounded-circle"
+  },
+  "sidebarMap": {
+    "/docs": "sidebar-docs"
+  },
+  "headerMap": {
+    "/": "header-default"
+  },
+  "footerMap": {
+    "/": "footer-default"
+  }
+}

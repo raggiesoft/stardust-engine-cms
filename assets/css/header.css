@@ -1,0 +1,52 @@
+/* ==========================================================================
+ * LAYOUT: HEADER
+ * Dynamic theme support and logo blend-mode logic
+ * ========================================================================== */
+
+header .navbar {
+    background-color: var(--bs-body-bg) !important;
+    border-bottom: 1px solid var(--bs-border-color) !important;
+    transition: background-color 0.3s ease;
+}
+
+header .navbar-brand {
+    color: var(--bs-heading-color, var(--bs-body-color)) !important;
+}
+
+header .nav-link {
+    color: var(--bs-secondary) !important;
+}
+
+header .nav-link:hover,
+header .nav-link.active {
+    color: var(--bs-primary) !important;
+}
+
+header .navbar-toggler {
+    border-color: var(--bs-border-color) !important;
+}
+
+header .dropdown-menu {
+    background-color: var(--bs-body-bg) !important;
+    border-color: var(--bs-border-color) !important;
+}
+
+header .dropdown-item {
+    color: var(--bs-body-color) !important;
+}
+
+header .dropdown-item:hover {
+    background-color: var(--bs-tertiary-bg) !important; 
+    color: var(--bs-primary) !important;
+}
+
+/* --- CORPORATE LOGO MAGIC --- */
+/* Allows JPEGs with white backgrounds to act like transparent PNGs */
+.navbar-brand-corporate-img {
+    mix-blend-mode: multiply; 
+}
+
+[data-bs-theme="dark"] .navbar-brand-corporate-img {
+    filter: invert(1) grayscale(100%); 
+    mix-blend-mode: screen; 
+}

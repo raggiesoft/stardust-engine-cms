@@ -1,0 +1,26 @@
+/* ==========================================================================
+ * LAYOUT: FOOTER
+ * Dynamic theme support
+ * ========================================================================== */
+
+footer {
+    background-color: var(--bs-body-bg) !important; 
+    color: var(--bs-body-color) !important;            
+    border-top: 1px solid var(--bs-border-color) !important;
+}
+
+footer .text-body-secondary,
+footer .text-muted {
+    color: var(--bs-secondary) !important; 
+}
+
+footer a,
+footer .link-secondary,
+footer .link-body-emphasis {
+    color: var(--bs-link-color) !important;
+}
+
+footer a:hover,
+footer .link-secondary:hover {
+    color: var(--bs-link-hover-color) !important;
+}
