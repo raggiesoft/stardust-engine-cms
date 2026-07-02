@@ -1,0 +1,54 @@
+<?php
+// errors/503.php
+// Context: "Service Unavailable" / Maintenance
+
+$is_standalone = !defined('ROOT_PATH');
+
+if ($is_standalone) {
+    define('ROOT_PATH', realpath(__DIR__ . '/../../'));
+    http_response_code(503);
+    $pageTitle = "503 Service Unavailable | Stardust Engine CMS";
+    require_once ROOT_PATH . '/includes/header.php';
+    echo '<div class="container-fluid flex-grow-1 d-flex"><div class="row flex-grow-1"><main id="main-content" class="col-12 p-0">';
+}
+?>
+
+<div class="container py-5 d-flex flex-column justify-content-center" style="min-height: 70vh;">
+    <div class="row justify-content-center text-center">
+        <div class="col-lg-8">
+            
+            <div class="mb-4">
+                <i class="fa-solid fa-helmet-safety fa-5x text-info opacity-75" aria-hidden="true"></i>
+            </div>
+
+            <h1 class="display-1 fw-bold text-info mb-0" style="letter-spacing: 5px;">503</h1>
+            <h2 class="h3 text-uppercase text-body-secondary font-monospace mb-4">
+                <span class="text-info">>></span> SYSTEM MAINTENANCE
+            </h2>
+            
+            <div class="card bg-body-tertiary p-4 border-info border-opacity-50 text-start mb-5 mx-auto shadow-sm" style="max-width: 600px;">
+                <div class="text-info fw-bold mb-2 border-bottom border-info border-opacity-25 pb-2">
+                    <i class="fa-solid fa-wrench me-2" aria-hidden="true"></i>Engineering Log // Scheduled Downtime
+                </div>
+                <div class="text-body">
+                    <p class="mb-2"><strong>STATUS:</strong> The server is currently unable to handle the request due to temporary maintenance or overloading.</p>
+                    <p class="mb-0 text-body-secondary small">Our engineers are deploying upgrades. The system will automatically resume operations shortly. Please standby.</p>
+                </div>
+            </div>
+            
+            <div class="d-flex justify-content-center gap-3 flex-wrap">
+                <a href="javascript:location.reload();" class="btn btn-outline-secondary rounded-pill px-4">
+                    <i class="fa-solid fa-rotate-right me-2" aria-hidden="true"></i>Refresh Page
+                </a>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<?php
+if ($is_standalone) {
+    echo '</main></div></div>';
+    require_once ROOT_PATH . '/includes/footer.php';
+}
+?>

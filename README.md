@@ -1,6 +1,7 @@
 # The Stardust Engine CMS
 
 ![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)
+![Release](https://img.shields.io/badge/Release-v0.1.0-success.svg)
 ![PHP](https://img.shields.io/badge/PHP-8.5-777BB4.svg)
 ![Ubuntu](https://img.shields.io/badge/Ubuntu-26.04_LTS-E95420.svg)
 ![JavaScript](https://img.shields.io/badge/JavaScript-Vanilla-F7DF1E.svg)
@@ -16,35 +17,47 @@ The Stardust Engine is built on the conviction that resilient software must resp
 ### 1. The Engine (PHP 8.5 & Nginx)
 A strictly structural MVC routing layer optimized for modern server environments.
 * **Native Infrastructure:** Engineered specifically for Ubuntu 26.04 LTS, utilizing native PHP 8.5 packages for enhanced security and stability without relying on third-party PPAs.
-* **Zero-Database:** Entirely flat-file architecture driven by PHP 8.5 arrays and includes.
-* **Centralized Configuration:** Uses JSON routing maps to determine layouts, sidebars, and SEO schema injection, keeping the codebase DRY and maintainable.
-* **Edge-Cache Synergy:** Pairs perfectly with Nginx routing and Cloudflare caching. The server seamlessly hands off static rendered HTML, drastically reducing origin load.
+* **Zero-Database:** Entirely flat-file architecture driven by PHP array manipulation and JSON data stores, resulting in incredibly low Time-to-First-Byte (TTFB).
 
-### 2. Elara SPA Router (Frontend)
-A highly optimized Vanilla JavaScript listener that intercepts internal navigation.
-* **Seamless Transitions:** Aborts hard refreshes, dynamically diffs the `<head>`, swaps stylesheets, and updates the `<body>` elements for instant, fluid page loads.
-* **Persistent Audio:** Audio and video elements continue playing uninterrupted across state changes, ideal for multimedia distribution and continuous playback.
-* **Scraper Immunity:** Features a native email obfuscation pipeline using HTML data-attributes, rendering contact details invisible to automated bots while remaining fully functional for actual users.
+### 2. Elara: The SPA Router
+A custom Vanilla JS engine that intercepts standard `<a href>` clicks and selectively swaps DOM nodes (`header`, `#elara-layout-wrapper`, `footer`) without a hard page refresh.
+* **Dynamic Theme Sync:** Automatically detects and diffs `<head>` attributes to seamlessly transition between Light and Dark modes.
+* **Ghost DOM Protection:** Assumes element destruction on navigation, enforcing global event delegation for extreme client-side stability.
 
-### 3. CI/CD Pipeline (Jenna & Sarah)
-Included bash automation scripts for zero-downtime atomic deployments.
-* **Jenna (Local):** Handles local packaging and acts as a strict QA gatekeeper, enforcing WCAG accessibility checks before code can be pushed.
+### 3. "Personified" CI/CD Pipeline (Jenna & Sarah)
+Included bash automation scripts for zero-downtime atomic deployments and semantic versioning.
+* **Jenna (Local):** Handles local packaging, generates sitemaps, accepts semantic release tags (e.g., `v0.1.0`), and acts as a strict QA gatekeeper.
 * **Sarah (Server):** Quietly pulls updates via `rsync` for seamless asset synchronization without ever requiring root server permissions.
 
-## ♿ Accessibility First
-This system does not just patch accessibility issues; it natively embeds them. The continuous integration scripts are designed to explicitly fail if required ARIA attributes or `alt` text configurations are missing. This guarantees universal navigability for screen readers and keyboard-only users right out of the box.
+## 🗺️ Directory Structure
 
-## 💻 Installation & Quick Start
-*(Documentation on generic boilerplate setup, Nginx configuration, and local environment initialization coming soon.)*
-
-## 📄 License
-This project is open-source software licensed under the [MIT License](LICENSE). **This framework is not, and will never be, available as a commercially licensed option.**
-
----
-
-## 👨‍💻 About the Architect
-**Built and maintained by Michael P. Ragsdale.**
-
-I am a professional systems architect and full-stack developer based in Norfolk, Virginia. I specialize in custom web infrastructure, strict accessibility compliance, and high-performance server configurations. 
-
-*Please note: I exclusively accept direct W-2 employment opportunities. I do not accept 1099 contract or vendor roles.*
+```text
+stardust-engine-cms/
+├── [RENAME_THIS_DIR]/            # The obfuscated core engine
+│   ├── [RENAME_THIS_ROUTER].php  # The primary router (elara.php)
+│   └── errors/                   # 404, 500, 503 fallback views
+├── assets/                       # Static files (Served natively via Nginx)
+│   ├── css/
+│   │   ├── root.css              # Global variables and color palettes
+│   │   ├── safety-net.css        # Typography and contrast fallbacks
+│   │   └── extras.css            # Glass-morphism and HUD UI components
+│   ├── js/
+│   │   └── elara-spa.js          # The Vanilla JS SPA Router
+│   └── images/
+├── data/
+│   ├── settings.example.json     # Global site variables
+│   └── routes/
+│       └── routes.example.json   # Hierarchical URL mapping
+├── devops/                       # Personified CI/CD Pipeline
+│   ├── jenna-sync.example.sh     # Local push/tag/sync automation
+│   └── sarah-deploy.example.sh   # Server-side autonomous pull/sync
+├── docs/
+│   └── ai-persona.md             # AI Co-Pilot prompt instructions
+├── includes/
+│   ├── components/               # Headers, footers, and sidebars
+│   └── modules/                  # Self-contained logic blocks (e.g. audio players)
+├── pages/                        # The physical PHP view fragments
+├── llms.txt                      # AI Architecture constraints
+├── nginx.conf.example            # Required server block configurations
+├── LICENSE
+└── README.md

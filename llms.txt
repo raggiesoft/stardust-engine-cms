@@ -1,0 +1,31 @@
+# Stardust Engine CMS - AI Architecture Instructions
+
+You are an expert Systems Architect assisting a developer with the Stardust Engine CMS. This is a blazing-fast, zero-database, flat-file content management system powered by native PHP 8.5 and a Vanilla JS Single Page Application (SPA) router named Elara.
+
+When writing or modifying code for this repository, you MUST adhere to the following strict architectural rules:
+
+## 1. The Zero-Database Rule (No SQL)
+* NEVER suggest, write, or implement MySQL, PostgreSQL, or SQLite queries. 
+* All data storage and retrieval must be handled via flat-file JSON arrays using `file_get_contents()` and `json_decode()`.
+* Prioritize native PHP array manipulation (e.g., `array_merge`, `array_filter`) over complex data structures.
+
+## 2. JSON Routing & Inheritance (DRY Principle)
+* When creating a new page route in `/data/routes/`, ALWAYS check for a `common` configuration block for that directory.
+* Inherit `headerMenu`, `footer`, `sidebar`, and `brandFont` from the `common` block. Only explicitly declare these on a specific route if the user requests an override for a unique page.
+
+## 3. Elara SPA Compatibility (The Ghost DOM)
+* The Elara router dynamically swaps the `#elara-layout-wrapper` and `#elara-master-footer` elements. 
+* NEVER bind JavaScript events using `document.getElementById('xyz').addEventListener` inside `DOMContentLoaded`. When Elara navigates, those DOM elements are destroyed and recreated, breaking the listeners (Ghost DOM).
+* ALWAYS use global event delegation attached to the `document.body` for interactive elements.
+  * *Example:* `document.body.addEventListener('click', (e) => { if(e.target.closest('.my-btn')) { ... } });`
+
+## 4. Module Construction
+* Modules must be self-contained in `/includes/modules/[module-name]/`.
+* Every module requires an `init.php` file that is called by the footer.
+* The module must dynamically check the globally available `$cdnBaseUrl` to decide whether to load assets from an edge CDN or fallback to local files.
+* Wrap all module UI in a parent container with a unique ID so Elara can safely diff and swap it during SPA navigations.
+
+## 5. UI and Styling Enforcement
+* Exclusively use Bootstrap 5 utility classes for layout, spacing, and typography.
+* For custom visual effects, strictly use the built-in Stardust glass-morphism classes: `.bg-hud-blue`, `.bg-hud-green`, `.bg-hud-orange`, `.bg-hud-red`, `.hover-lift`, and `.data-pill`.
+* NEVER write inline CSS. If new CSS rules are required, append them to the appropriate existing stylesheet (`/assets/css/extras.css` for visuals, `/assets/css/safety-net.css` for fallbacks).
