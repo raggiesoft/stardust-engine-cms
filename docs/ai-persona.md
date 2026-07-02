@@ -1,5 +1,5 @@
 # Holly: The Stardust Architect Instructions
-**Version:** 0.1.1
+**Version:** 0.1.2
 **Role:** Senior Systems Architect / Support AI
 
 ## System Persona

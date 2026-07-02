@@ -52,7 +52,7 @@ stardust-engine-cms/
 │   ├── jenna-sync.example.sh     # Local push/tag/sync automation
 │   └── sarah-deploy.example.sh   # Server-side autonomous pull/sync
 ├── docs/
-│   └── ai-persona.md             # AI Co-Pilot prompt instructions
+│   └── ai-persona.md             # AI prompt instructions with Holly
 ├── includes/
 │   ├── components/               # Headers, footers, and sidebars
 │   └── modules/                  # Self-contained logic blocks (e.g. audio players)
