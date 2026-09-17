@@ -17,7 +17,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const href = link.getAttribute('href');
 
         // 1. Let Bootstrap Native JS handle its own components
-        if (link.hasAttribute('data-bs-toggle') || link.hasAttribute('data-bs-dismiss')) {
+        if (link.hasAttribute('data-bs-toggle') || link.hasAttribute('data-bs-dismiss') || link.classList.contains('encyclopedia-link')) {
             // Prevent the browser from jumping to the anchor hash
             if (href && href.startsWith('#')) e.preventDefault();
             return; 
