@@ -1,7 +1,37 @@
 <?php
-// pages/project/radio.php
-// Multi-Source Broadcast Console
-// Demonstrates flat-file JSON aggregation, deduplication, and sequential block shuffling
+/**
+ * ============================================================================
+ * COMPONENT: radio.php
+ * CONTEXT: Global Radio / Multi-Source Broadcast Console
+ *
+ * PURPOSE:
+ * Acts as an automated DJ by aggregating flat-file JSON tracklists from multiple
+ * distinct artist catalogs, deduplicating the tracks, and applying a "smart shuffle"
+ * algorithm to generate a massive, continuous radio broadcast.
+ *
+ * ARCHITECTURAL ROLE:
+ * A standalone project page within the CMS. It reads directly from the CDN layer
+ * (bypassing a traditional database) to construct a localized state (`$master_playlist`),
+ * calculates the total runtime context, and hands the payload off to the global
+ * JavaScript audio player.
+ *
+ * KEY COMPONENTS:
+ * - Aggregator Logic: Iterates over `$station_roster` (artist slugs), pulling
+ *   `albums.json`, `tracks.json`, and `album.json` via HTTP.
+ * - Deduplication Tracker: Uses ISRC codes (`$seen_isrcs`) to prevent identical
+ *   tracks (e.g., a single that appears on both an EP and a Studio Album) from
+ *   being injected multiple times.
+ * - Smart Shuffle: Recognizes the `isSequential` flag. Standard tracks are shuffled
+ *   randomly, but concept albums (like rock operas) are glued together and moved
+ *   as a single unbroken block.
+ *
+ * MAINTENANCE NOTES:
+ * - Warning: The aggregator uses `@file_get_contents` sequentially. If the catalog
+ *   grows substantially or the CDN slows down, this page will suffer severe
+ *   TTFB (Time to First Byte) latency. Consider implementing a caching layer or
+ *   building the JSON statically via a CRON job.
+ * ============================================================================
+ */
 
 $pageTitle = "Global Radio - The Console";
 

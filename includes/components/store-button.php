@@ -1,6 +1,32 @@
 <?php
-// --- Component: store-button.php ---
-// V2: DSP Streaming + Physical Merch Routing
+/**
+ * ============================================================================
+ * COMPONENT: store-button.php
+ * VERSION: V2 (DSP Streaming + Physical Merch Routing)
+ *
+ * PURPOSE:
+ * Renders a dynamically grouped set of external links routing users to their
+ * preferred streaming platform (Spotify, Apple, etc.) or physical merchandise
+ * stores (Vinyl, CD, Apparel).
+ *
+ * ARCHITECTURAL ROLE:
+ * A reusable UI component designed to be included across artist pages, album pages,
+ * and tracklist views. It reads `$storeProps` configured in the parent scope.
+ *
+ * KEY COMPONENTS:
+ * - Streaming Dropdown: Uses `localStorage` (via external JS) to remember the user's
+ *   preferred DSP and defaults the primary button to that service.
+ * - Merch Dropdown: Conditionally rendered only if physical merchandise links are
+ *   provided in `$storeProps`.
+ * - URL Generation: Dynamically switches routing logic between `artist` endpoints
+ *   and `album` endpoints based on the `$type` parameter.
+ *
+ * MAINTENANCE NOTES:
+ * - Ensure `$storeProps` is populated before including this file. Expected keys:
+ *   'type', 'size', 'spotify', 'apple', 'amazon', 'youtube', 'vinyl', 'cd', 'apparel'.
+ * - External JS handles the `store-selector-link` click events to set global preferences.
+ * ============================================================================
+ */
 
 $type = $storeProps['type'] ?? 'album'; 
 $size = $storeProps['size'] ?? 'medium';

@@ -1,6 +1,30 @@
 <?php
-// pages/project/dynamic-directory.php
-// Demonstrates reading $_GET values for dynamic view rendering within the SPA
+/**
+ * ============================================================================
+ * COMPONENT: dynamic-directory.php
+ * CONTEXT: Project View / SPA Parameter Routing Test
+ *
+ * PURPOSE:
+ * Demonstrates and validates the capability of the Elara SPA router to pass
+ * query string parameters (`$_GET`) to backend PHP scripts without triggering
+ * a hard browser refresh.
+ *
+ * ARCHITECTURAL ROLE:
+ * A standalone project page within the CMS. It simulates a database by reading
+ * from a hardcoded `$catalog` array, mutating its UI state based on the presence
+ * and validity of the `?id=` query parameter.
+ *
+ * KEY COMPONENTS:
+ * - State Management: Distinguishes between the master list view (no `id`),
+ *   a valid detail view, and a 404 "Not Found" state if an invalid `id` is passed.
+ * - Input Sanitization: Wraps `$_GET['id']` in `htmlspecialchars` and `strip_tags`
+ *   to prevent XSS if the identifier is printed back to the DOM during a 404.
+ *
+ * MAINTENANCE NOTES:
+ * - When adapting this pattern for database connections, ensure prepared statements
+ *   are used rather than direct array key lookups.
+ * ============================================================================
+ */
 
 // 1. Simulate a data source (In production, replace with json_decode(file_get_contents(...)))
 $catalog = [

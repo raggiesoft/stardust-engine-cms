@@ -1,7 +1,32 @@
-/* ==========================================================================
- * SAFETY NET
- * Fallback typography and critical dark mode contrast fixes
- * ========================================================================== */
+/**
+ * ============================================================================
+ * COMPONENT: safety-net.css
+ * CONTEXT: Baseline Typography & Theming Fallbacks
+ *
+ * PURPOSE:
+ * Provides essential structural styling that must execute before custom fonts
+ * or complex themes are loaded. Ensures the site remains usable and readable
+ * during FOUC (Flash of Unstyled Content) or if webfont CDNs fail.
+ *
+ * ARCHITECTURAL ROLE:
+ * Included in the `<head>` of every page. It acts as a bridge between the browser's
+ * default user-agent stylesheet and the heavy Stardust Engine CSS.
+ *
+ * KEY COMPONENTS:
+ * - Typography Baseline: Enforces system fonts globally and standardizes
+ *   heading weights to prevent severe layout shifts when custom fonts load.
+ * - Dark Mode Contrast Fixes: Intercepts generic `.text-muted` and `.bg-light`
+ *   classes when in a dark context (via media query or data attribute) and
+ *   forces them to inherit the proper CSS variables. This prevents invisible
+ *   text bugs (e.g. dark text on a dark background).
+ *
+ * MAINTENANCE NOTES:
+ * - Do NOT place heavy styling or base64 embedded fonts in this file. It must
+ *   remain as lightweight as possible.
+ * - Ensure media query fallbacks (`prefers-color-scheme`) stay synchronized
+ *   with explicit attribute overrides (`data-bs-theme="dark"`).
+ * ============================================================================
+ */
 
 /* Typography Baseline */
 body {

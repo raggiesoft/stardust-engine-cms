@@ -1,63 +1,94 @@
 /* ==========================================================================
- * ROOT VARIABLES (Stardust Engine Default)
- * Core palette and theme mappings
+ * ARCHITECTURAL OVERVIEW: root.css
+ * ==========================================================================
+ * Defines the core color palette, CSS variables, and dynamic theme mappings 
+ * for the Stardust Engine CMS. This acts as the foundational design system 
+ * overlay on top of Bootstrap.
+ * 
+ * FUTURE MAINTENANCE NOTES:
+ * - Always provide both hex values AND comma-separated RGB variants 
+ *   (`--bs-*-rgb`) when adding new colors, as Bootstrap relies on the RGB 
+ *   forms for opacity modifications via `rgba()`.
+ * - The forced dark mode block (`[data-bs-theme="dark"]`) MUST perfectly mirror 
+ *   the `@media (prefers-color-scheme: dark)` block to ensure manual theme 
+ *   overrides via settings.json work identically to system-level preferences.
  * ========================================================================== */
 
-/* Light Mode (Default) */
+/* --------------------------------------------------------------------------
+ * 1. Light Mode (Default Theme State)
+ * -------------------------------------------------------------------------- */
 :root,
 [data-bs-theme="light"] {
-  --bs-primary: #0d6efd;       /* Engine Blue */
+  --bs-primary: #0d6efd;       /* Engine Blue - Primary Brand Accent */
   --bs-primary-rgb: 13, 110, 253;
   
-  --bs-secondary: #6c757d;     /* Slate */
+  --bs-secondary: #6c757d;     /* Slate - Subtle Elements & Muted Text */
   --bs-secondary-rgb: 108, 117, 125;
   
-  --bs-success: #198754;       /* Deep Green (Readable) */
+  --bs-success: #198754;       /* Deep Green - Validations & Positives */
   --bs-success-rgb: 25, 135, 84;
   
-  --bs-info: #0dcaf0;          /* Cyan */
+  --bs-info: #0dcaf0;          /* Cyan - Highlights & Alerts */
   --bs-info-rgb: 13, 202, 240;
 
-  --bs-warning: #fd7e14;       /* High-Vis Orange */
+  --bs-warning: #fd7e14;       /* High-Vis Orange - Cautions */
   --bs-warning-rgb: 253, 126, 20;
 
-  --bs-danger: #dc3545;        /* Alert Red */
+  --bs-danger: #dc3545;        /* Alert Red - Errors & Destructive Actions */
   --bs-danger-rgb: 220, 53, 69;
   
-  --bs-body-bg: #f8f9fa;
-  --bs-body-color: #212529;
+  /* Structural Surfaces */
+  --bs-body-bg: #f8f9fa;       /* Very Light Gray - Page Base */
+  --bs-body-color: #212529;    /* Near Black - Primary Typography */
   --bs-body-bg-rgb: 248, 249, 250;
   --bs-body-color-rgb: 33, 37, 41;
 
+  /* Interactive Elements */
   --bs-link-color: #0d6efd;
   --bs-link-hover-color: #0a58ca;
+  
+  /* Dividing Elements */
   --bs-border-color: #dee2e6;
   --bs-border-color-translucent: rgba(0, 0, 0, 0.175);
 }
 
-/* Dark Mode Override */
+/* --------------------------------------------------------------------------
+ * 2. Dark Mode Override (System Preference Driven)
+ * -------------------------------------------------------------------------- */
 @media (prefers-color-scheme: dark) {
   :root {
-    --bs-body-bg: #121212;      /* Deep Space */
-    --bs-body-color: #e0e0e0;   /* Star White */
+    /* Structural Surfaces */
+    --bs-body-bg: #121212;      /* Deep Space Black */
+    --bs-body-color: #e0e0e0;   /* Star White text for optimal contrast */
     --bs-body-bg-rgb: 18, 18, 18;
     --bs-body-color-rgb: 224, 224, 224;
 
+    /* Interface Accents */
     --bs-secondary: #adb5bd;
-    --bs-border-color: #343a40;
+    --bs-border-color: #343a40; /* Subdued borders to reduce glare */
     --bs-border-color-translucent: rgba(255, 255, 255, 0.15);
 
-    --bs-link-color: #6ea8fe;
+    /* Interactive Elements */
+    --bs-link-color: #6ea8fe;   /* Brightened blue for dark background legibility */
     --bs-link-hover-color: #ffffff;
-    --bs-tertiary-bg: #1a1d20;
+    
+    /* Backgrounds */
+    --bs-tertiary-bg: #1a1d20;  /* Slightly elevated surface color */
 
+    /* Thematic Adjustments for Dark Backgrounds */
     --bs-success: #75b798; 
     --bs-info: #6edff6;
     --bs-warning: #ffc107;
   }
 }
 
-/* Force Dark Mode (Triggered by JSON settings) */
+/* --------------------------------------------------------------------------
+ * 3. Forced Dark Mode Override (Manual Trigger Driven)
+ * -------------------------------------------------------------------------- 
+ * This block exactly duplicates the properties from the @media query above.
+ * It activates when `data-bs-theme="dark"` is injected by `header.php` via 
+ * the `$settings['forceDarkThemes']` configuration logic.
+ */
 [data-bs-theme="dark"] {
     --bs-body-bg: #121212;
     --bs-body-color: #e0e0e0;

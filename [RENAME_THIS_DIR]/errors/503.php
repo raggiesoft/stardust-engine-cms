@@ -1,6 +1,30 @@
 <?php
-// errors/503.php
-// Context: "Service Unavailable" / Maintenance
+/**
+ * ============================================================================
+ * COMPONENT: 503.php
+ * CONTEXT: "Service Unavailable" / Maintenance View
+ *
+ * PURPOSE:
+ * Displays a themed 503 Service Unavailable error page during scheduled downtime,
+ * system upgrades, or when the server is temporarily overloaded and cannot
+ * process the request.
+ *
+ * ARCHITECTURAL ROLE:
+ * Typically loaded by Apache ErrorDocument directives when the backend is offline,
+ * or explicitly routed when the CMS enters a maintenance state.
+ *
+ * KEY COMPONENTS:
+ * - Standalone Check: Validates `ROOT_PATH` existence. If absent, it assumes
+ *   direct invocation via web server error rules, sets the 503 HTTP response
+ *   code, and injects the global site wrapper.
+ * - Thematic UI: Employs an "Engineering Log // Scheduled Downtime" motif to
+ *   keep the visitor engaged within the narrative despite the outage.
+ *
+ * MAINTENANCE NOTES:
+ * - Always emit the proper 503 HTTP code to prevent search engines from
+ *   indexing the maintenance page as valid content.
+ * ============================================================================
+ */
 
 $is_standalone = !defined('ROOT_PATH');
 

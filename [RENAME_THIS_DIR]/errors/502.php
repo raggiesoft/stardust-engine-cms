@@ -1,6 +1,29 @@
 <?php
-// errors/502.php
-// Context: "Bad Gateway" / Upstream Error
+/**
+ * ============================================================================
+ * COMPONENT: 502.php
+ * CONTEXT: "Bad Gateway" / Upstream Error View
+ *
+ * PURPOSE:
+ * Displays a themed 502 Bad Gateway error page when the web server (acting as a
+ * reverse proxy) receives an invalid response from an upstream server (e.g. PHP-FPM).
+ *
+ * ARCHITECTURAL ROLE:
+ * Loaded dynamically by the web server (e.g. Apache ErrorDocument, Nginx proxy_pass
+ * fallback) when the application layer crashes or drops the connection prematurely.
+ *
+ * KEY COMPONENTS:
+ * - Standalone Check: Inspects `ROOT_PATH` to see if loaded independently of the
+ *   CMS router. If true, sets the 502 HTTP response code and embeds the error
+ *   within the global header/footer structure.
+ * - Thematic UI: Styled as a "Network Error // Upstream Proxy" to keep the
+ *   narrative consistent during technical failures.
+ *
+ * MAINTENANCE NOTES:
+ * - Ensure `$is_standalone` logic remains at the very top of the script so HTTP
+ *   headers can be sent correctly without "headers already sent" warnings.
+ * ============================================================================
+ */
 
 $is_standalone = !defined('ROOT_PATH');
 

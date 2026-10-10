@@ -1,4 +1,34 @@
 <?php
+/**
+ * ============================================================================
+ * COMPONENT: parsedown.php (3rd Party Library)
+ * VERSION: 1.8.0
+ *
+ * PURPOSE:
+ * Provides a fast, compliant Markdown parser in PHP. Converts Markdown text
+ * (like lyrics, lore entries, or blog posts) into HTML for display across
+ * the Stardust Engine CMS.
+ *
+ * ARCHITECTURAL ROLE:
+ * Used as a core dependency for content rendering. It is wrapped or instantiated
+ * by various view components to safely parse user or author-generated Markdown
+ * into web-ready markup.
+ *
+ * KEY COMPONENTS:
+ * - `text()`: The main entry point to parse a full block of Markdown.
+ * - `lineElements()` / `textElements()`: Handles line-by-line block parsing.
+ * - Inline parsing methods (links, bold, italic, code).
+ *
+ * MAINTENANCE NOTES:
+ * - This is a 3rd-party library (Parsedown). DO NOT modify its core logic.
+ * - Any custom markdown extensions should be built by extending the `Parsedown`
+ *   class rather than modifying this file directly.
+ *
+ * LICENSE:
+ * (c) Emanuil Rusev | http://erusev.com
+ * Licensed under the MIT License.
+ * ============================================================================
+ */
 
 #
 #

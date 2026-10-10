@@ -1,6 +1,31 @@
 <?php
-// errors/403.php
-// Context: "Access Denied" / Security Breach
+/**
+ * ============================================================================
+ * COMPONENT: 403.php
+ * CONTEXT: "Access Denied" / Security Breach View
+ *
+ * PURPOSE:
+ * Displays a themed 403 Access Denied error page to users when they attempt to
+ * access restricted directories, protected files, or resources without proper
+ * authorization.
+ *
+ * ARCHITECTURAL ROLE:
+ * Loaded dynamically by the CMS router on permission failure, or accessed
+ * directly (standalone) by the web server (e.g. via Apache ErrorDocument)
+ * when a direct file request is forbidden by server rules.
+ *
+ * KEY COMPONENTS:
+ * - Standalone Check: Checks `ROOT_PATH` to see if invoked by the web server.
+ *   If so, it sets the 403 HTTP status code, bootstraps the environment, and
+ *   wraps the error content in the global site theme.
+ * - Thematic UI: Utilizes "Access Restricted" / "Security Violation" motifs
+ *   to align the error state with the site's narrative framework.
+ *
+ * MAINTENANCE NOTES:
+ * - The `$is_standalone` block must remain at the top to ensure HTTP headers
+ *   can be sent cleanly before any output is rendered by the Apache fallback.
+ * ============================================================================
+ */
 
 $is_standalone = !defined('ROOT_PATH');
 

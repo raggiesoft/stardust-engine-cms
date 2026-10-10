@@ -1,9 +1,30 @@
 <?php
-// pages/home.php
-// The Global Root Document (Mapped to '/')
-
-// Elara automatically injects variables from settings.json and routes.json.
-// Example: $siteName, $pageTitle, $cdnBaseUrl
+/**
+ * ============================================================================
+ * COMPONENT: home.php
+ * CONTEXT: Global Root Document
+ *
+ * PURPOSE:
+ * Serves as the primary landing page (`/`) for the Stardust Engine CMS, introducing
+ * users to the core capabilities and routing them to key documentation or project
+ * sections.
+ *
+ * ARCHITECTURAL ROLE:
+ * This view is bound to the root path via `routes.json`. It relies on Elara
+ * to automatically inject global configuration variables (like `$siteName`)
+ * defined in `settings.json` before this file is executed.
+ *
+ * KEY COMPONENTS:
+ * - Variable Injection: Demonstrates the usage of `$siteName` which is extracted
+ *   and passed down from the Front Controller.
+ * - SPA Navigation: Contains standard anchor tags (`href="/project"`) which Elara
+ *   intercepts to perform a seamless Page-to-Page transition without a hard reload.
+ *
+ * MAINTENANCE NOTES:
+ * - Do not hardcode the site name or CDN URLs here; always rely on the globally
+ *   injected variables to ensure environments (Dev/Prod) sync correctly.
+ * ============================================================================
+ */
 ?>
 
 <div class="container-fluid py-5 bg-body-tertiary border-bottom">

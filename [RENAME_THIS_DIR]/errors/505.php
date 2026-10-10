@@ -1,6 +1,30 @@
 <?php
-// errors/504.php
-// Context: "Gateway Timeout"
+/**
+ * ============================================================================
+ * COMPONENT: 505.php (Note: Implements 504 Gateway Timeout logic)
+ * CONTEXT: "Gateway Timeout" / Connection Latency View
+ *
+ * PURPOSE:
+ * Displays a themed timeout error page when the server fails to receive a timely
+ * response from an upstream server (e.g. during heavy backend load or API failure).
+ *
+ * ARCHITECTURAL ROLE:
+ * Serves as the fallback view for 50x timeout errors. Currently named 505.php but
+ * explicitly emits a 504 HTTP Response Code, used by Apache ErrorDocument directives.
+ *
+ * KEY COMPONENTS:
+ * - Standalone Check: Injects `ROOT_PATH` and invokes header/footer includes if
+ *   accessed directly by the web server outside of the CMS router flow.
+ * - Thematic UI: Formatted as a "Connection Latency // Request Dropped" warning
+ *   to maintain immersion.
+ *
+ * MAINTENANCE NOTES:
+ * - There is a discrepancy between the filename (505.php) and the HTTP response
+ *   code emitted (504). Consider aligning these if updating routing rules.
+ * - Do not alter the `$is_standalone` check; it is required for proper rendering
+ *   when bypassing the front controller.
+ * ============================================================================
+ */
 
 $is_standalone = !defined('ROOT_PATH');
 

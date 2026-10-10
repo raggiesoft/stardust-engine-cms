@@ -1,6 +1,30 @@
 <?php
-// errors/404.php
-// Context: "Page Not Found"
+/**
+ * ============================================================================
+ * COMPONENT: 404.php
+ * CONTEXT: "Page Not Found" Error View
+ *
+ * PURPOSE:
+ * Displays a themed 404 Not Found error page to users when an requested resource,
+ * file, or JSON route map cannot be located on the server.
+ *
+ * ARCHITECTURAL ROLE:
+ * This view can be loaded dynamically by the CMS router when a route isn't found,
+ * or accessed directly (standalone) by the web server (e.g. via Apache ErrorDocument).
+ *
+ * KEY COMPONENTS:
+ * - Standalone Check: Determines if the file was accessed directly by checking
+ *   for the `ROOT_PATH` constant. If standalone, it bootstraps the environment
+ *   and includes the global header/footer to ensure the error doesn't break out
+ *   of the site theme.
+ * - Thematic UI: Uses the Stardust Engine's UI/UX styling (e.g. "Signal Lost",
+ *   "Return to Base") to keep the error state immersive within the lore.
+ *
+ * MAINTENANCE NOTES:
+ * - Do not remove the `$is_standalone` logic, as the web server relies on it
+ *   to render the full page wrapper when bypassing the front controller.
+ * ============================================================================
+ */
 
 $is_standalone = !defined('ROOT_PATH');
 

@@ -1,6 +1,29 @@
 <?php
-// pages/project/overview.php
-// Mapped to '/project' via Elara auto-discovery
+/**
+ * ============================================================================
+ * COMPONENT: overview.php
+ * CONTEXT: Project Section / Root Landing View
+ *
+ * PURPOSE:
+ * Serves as the primary landing page for the `/project` namespace, providing
+ * structural navigation (breadcrumbs and list groups) to deeper nested views
+ * like `/project/about` or `/project/portfolio`.
+ *
+ * ARCHITECTURAL ROLE:
+ * Mapped to the `/project` URL implicitly via the Elara router's auto-discovery
+ * logic. It demonstrates how JSON routing maps can define a `common` block so
+ * that all sibling views in the directory inherit the same sidebar or header UI.
+ *
+ * KEY COMPONENTS:
+ * - Breadcrumb Navigation: Re-establishes the user's location within the hierarchy.
+ * - Deep Links: Routes to other pages within the module utilizing standard
+ *   anchor tags that Elara will intercept for SPA loading.
+ *
+ * MAINTENANCE NOTES:
+ * - Ensure that paths in the `list-group` links align precisely with the keys
+ *   defined in the JSON route map to prevent 404 errors during SPA transitions.
+ * ============================================================================
+ */
 ?>
 
 <div class="container py-4">

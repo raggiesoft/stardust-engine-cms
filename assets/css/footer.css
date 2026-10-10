@@ -1,25 +1,38 @@
 /* ==========================================================================
- * LAYOUT: FOOTER
- * Dynamic theme support
+ * ARCHITECTURAL OVERVIEW: footer.css
+ * ==========================================================================
+ * This stylesheet manages the visual structure and dynamic theme support for 
+ * the generic Stardust Engine footer block (`#elara-master-footer` / `footer`).
+ * 
+ * FUTURE MAINTENANCE NOTES:
+ * - This file heavily relies on CSS variables (`var(--bs-*)`) to ensure 
+ *   automatic synchronization with Bootstrap's native color modes (light/dark).
+ * - Modifying fixed classes (like `.text-muted`) here overrides default Bootstrap 
+ *   utilities to ensure optimal contrast against the forced background. 
  * ========================================================================== */
 
 footer {
+    /* Enforce the primary body background to prevent visual bleeding */
     background-color: var(--bs-body-bg) !important; 
     color: var(--bs-body-color) !important;            
+    /* Subdued separator to demarcate the footer from main content */
     border-top: 1px solid var(--bs-border-color) !important;
 }
 
+/* Ensure secondary text maintains contrast in both light and dark modes */
 footer .text-body-secondary,
 footer .text-muted {
     color: var(--bs-secondary) !important; 
 }
 
+/* Standardize link colors within the footer context */
 footer a,
 footer .link-secondary,
 footer .link-body-emphasis {
     color: var(--bs-link-color) !important;
 }
 
+/* Provide clear visual feedback on link interaction */
 footer a:hover,
 footer .link-secondary:hover {
     color: var(--bs-link-hover-color) !important;

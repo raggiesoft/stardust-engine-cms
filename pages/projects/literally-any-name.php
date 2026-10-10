@@ -1,4 +1,27 @@
 <?php
+/**
+ * ============================================================================
+ * STARDUST ENGINE CMS - DECOUPLED ROUTING DEMO
+ * ============================================================================
+ * 
+ * ARCHITECTURE OVERVIEW:
+ * This view serves strictly as a demonstrative tool to explain the CMS's 
+ * decoupled routing architecture. It proves that the physical file name 
+ * (`literally-any-name.php`) has no forced correlation to the public-facing URL.
+ * 
+ * CORE RESPONSIBILITIES:
+ * 1. Educational Content: Explains the difference between traditional flat-file 
+ *    CMS routing and Stardust's JSON-based mapping.
+ * 2. Code Presentation: Utilizes Bootstrap UI components to display a code 
+ *    snippet demonstrating the configuration block required to route a semantic 
+ *    URL to an abstractly named file.
+ * 
+ * USAGE INSTRUCTIONS:
+ * - This file can be safely deleted in production environments.
+ * - Review this file to understand how to structure the `routes.json` file 
+ *   located in the `data/routes/` directory.
+ * ============================================================================
+ */
 // pages/project/literally-any-name.php
 // This file demonstrates the complete decoupling of URLs and physical files.
 ?>
@@ -14,6 +37,7 @@
       </ol>
     </nav>
 
+    <!-- Header Section -->
     <div class="row mb-5">
         <div class="col-12">
             <h1 class="display-5 fw-bold text-body-emphasis mb-3">Decoupled Architecture</h1>
@@ -23,7 +47,10 @@
         </div>
     </div>
 
+    <!-- Educational Grid Section -->
     <div class="row g-4">
+        
+        <!-- Explanation: The URL limitation in traditional CMS -->
         <div class="col-md-6">
             <div class="card h-100 border-0 shadow-sm bg-body-tertiary">
                 <div class="card-body p-4">
@@ -40,6 +67,7 @@
             </div>
         </div>
 
+        <!-- Explanation: The JSON Solution in Stardust -->
         <div class="col-md-6">
             <div class="card h-100 border-0 shadow-sm bg-body-tertiary">
                 <div class="card-body p-4">
@@ -57,6 +85,7 @@
         </div>
     </div>
 
+    <!-- Code Snippet Display Section -->
     <div class="row mt-5">
         <div class="col-12">
             <div class="card shadow-sm border-secondary border-opacity-25">
@@ -64,6 +93,7 @@
                     <i class="fa-brands fa-js me-2" aria-hidden="true"></i>data/routes/routes.example.json
                 </div>
                 <div class="card-body p-0">
+<!-- Preformatted code block showcasing JSON configuration -->
 <pre class="m-0 p-4 font-monospace bg-dark text-light overflow-auto" style="border-bottom-left-radius: var(--bs-card-inner-border-radius); border-bottom-right-radius: var(--bs-card-inner-border-radius);">
 <code>"/project/secret-page": {
   "view": "pages/project/literally-any-name",

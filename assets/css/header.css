@@ -1,7 +1,32 @@
-/* ==========================================================================
- * LAYOUT: HEADER
- * Dynamic theme support and logo blend-mode logic
- * ========================================================================== */
+/**
+ * ============================================================================
+ * COMPONENT: header.css
+ * CONTEXT: Global Navigation Layout
+ *
+ * PURPOSE:
+ * Enforces dynamic theming variables on the global navigation bar, ensuring
+ * seamless transitions between light and dark modes without requiring complex
+ * JavaScript toggles.
+ *
+ * ARCHITECTURAL ROLE:
+ * Included globally. It overrides Bootstrap's default hardcoded navbar colors
+ * and forces them to inherit from the root CSS custom properties (`--bs-*`).
+ *
+ * KEY COMPONENTS:
+ * - Dynamic Variable Binding: Connects nav links, dropdowns, and borders
+ *   to `var(--bs-body-color)` and `var(--bs-primary)`, allowing the active
+ *   theme stylesheet to cascade upward and style the header instantly.
+ * - Corporate Logo Magic: A critical visual hack for legacy image assets.
+ *   Uses `mix-blend-mode: multiply` to make white backgrounds transparent in
+ *   light mode. In dark mode (`data-bs-theme="dark"`), it aggressively inverts
+ *   the image and switches to `mix-blend-mode: screen`, ensuring black text/logos
+ *   become white and visible against the dark header.
+ *
+ * MAINTENANCE NOTES:
+ * - Do not remove the `!important` tags here; they are necessary to defeat
+ *   Bootstrap's high-specificity `.navbar-light` and `.navbar-dark` classes.
+ * ============================================================================
+ */
 
 header .navbar {
     background-color: var(--bs-body-bg) !important;

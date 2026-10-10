@@ -1,6 +1,30 @@
 <?php
-// errors/500.php
-// Context: "Internal Server Error"
+/**
+ * ============================================================================
+ * COMPONENT: 500.php
+ * CONTEXT: "Internal Server Error" / System Failure View
+ *
+ * PURPOSE:
+ * Displays a themed 500 Internal Server Error page when a fatal exception,
+ * syntax error, or unhandled condition halts script execution entirely.
+ *
+ * ARCHITECTURAL ROLE:
+ * Often acts as the final safety net caught by the web server (e.g. Apache
+ * ErrorDocument) when PHP crashes and cannot output standard HTML.
+ *
+ * KEY COMPONENTS:
+ * - Standalone Check: Inspects `ROOT_PATH` to see if invoked by the web server
+ *   after a crash. If true, explicitly sends the 500 HTTP header and loads the
+ *   theme wrapper so the user doesn't see a raw server error.
+ * - Thematic UI: Displays "System Failure // Execution Halted" alongside
+ *   diagnostics instructing the administrator to check PHP error logs.
+ *
+ * MAINTENANCE NOTES:
+ * - The code in this file must remain extremely simple and robust. If this file
+ *   contains a syntax error, the web server will fall back to its default,
+ *   unthemed 500 page.
+ * ============================================================================
+ */
 
 $is_standalone = !defined('ROOT_PATH');
 

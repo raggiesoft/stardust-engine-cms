@@ -1,7 +1,29 @@
 <?php
 /**
+ * ============================================================================
  * COMPONENT: _tracklist-downloader.php
  * VERSION: 10.3 (Schema.org Deep Metadata, Store Routing & DSP Exemption Logic)
+ *
+ * PURPOSE:
+ * Generates the tracklist interface for albums, handles streaming link routing,
+ * manages Schema.org metadata integration, and controls access to digital archives
+ * (including vault paywall logic and DSP exemptions).
+ *
+ * ARCHITECTURAL ROLE:
+ * Acts as a view component that processes JSON metadata (from track/album endpoints)
+ * and dynamically renders the album's tracklist UI, DSP links, and download options
+ * within the Stardust Engine CMS.
+ *
+ * KEY COMPONENTS:
+ * - Metadata Processing: Loads `tracks.json`, `album.json`, and `albums.json` to 
+ *   determine tracks, lore, and global store routing.
+ * - Schema.org Translation: Maps custom release/production types to standard formats.
+ * - DSP Routing: Calculates links for Spotify, Apple, etc., or applies exemptions.
+ * - Player Integration: Exposes the generated tracklist via a JS event `stardust:playlist-update`.
+ *
+ * MAINTENANCE NOTES:
+ * - If modifying JSON payload structures, ensure backwards compatibility with `albums_master_content`.
+ * - Do not remove the `license-gate` class on download links without updating vault security rules.
  *
  * LICENSE:
  * The architecture and code of this file are licensed under the MIT License.
@@ -9,6 +31,7 @@
  * * The underlying narrative, lore, and music tracks delivered by this component 
  * are licensed under Creative Commons Attribution-ShareAlike 4.0 International (CC BY-SA 4.0),
  * except where commercial distribution exemptions apply (e.g., DSP streaming links).
+ * ============================================================================
  */
 
 // ==============================================================================
