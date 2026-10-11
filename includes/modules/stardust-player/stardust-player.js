@@ -17,7 +17,7 @@
  * 3. Accessibility & MediaSession API: Updates OS-level media controls, updates 
  *    page titles, and manages aria labels/live regions for screen readers.
  * 4. Dynamic Lyrics Parser: Fetches external Markdown files, parses basic 
- *    formatting (bold, headers, sections), and renders HTML into a Bootstrap modal.
+ *    formatting (bold, headers, sections), and renders HTML into a Web Awesome dialog.
  * 
  * USAGE:
  * - Requires the existence of specific DOM IDs (found in `sticky-player.php`).
@@ -36,7 +36,8 @@
 (function() {
     // --- 1. GLOBAL STATE & CONFIGURATION ---
     let currentIndex = -1;       // Tracks the currently playing song index within the playlist
-    let currentBlobUrl = null;   // Holds the memory reference (ObjectURL) to the fetched audio file
+    let currentBlobUrl = null;
+    let currentIsrc = null;      // Holds the ISRC of the currently playing track   // Holds the memory reference (ObjectURL) to the fetched audio file
     
     // Playback Settings (Persisted in LocalStorage)
     const REPEAT_MODES = ['none', 'all', 'one', 'album'];
@@ -74,7 +75,24 @@
         modalContent: document.getElementById('lyricsContent')
     };
 
-    let bsModal = null; // Bootstrap Modal Instance reference
+    
+
+
+    function showToast(message) {
+        let toastEl = document.querySelector('wa-toast#stardust-toast-stack');
+        if (!toastEl) {
+            toastEl = document.createElement('wa-toast');
+            toastEl.id = 'stardust-toast-stack';
+            toastEl.placement = 'bottom-end';
+            document.body.appendChild(toastEl);
+        }
+        
+        const item = document.createElement('wa-toast-item');
+        item.variant = 'success';
+        item.duration = 4000;
+        item.innerHTML = message;
+        toastEl.appendChild(item);
+    }
 
     // ========================================================================
     // INITIALIZATION & EVENT LISTENERS
@@ -92,9 +110,7 @@
         dom.title.setAttribute('aria-atomic', 'true');
 
         // Initialize Bootstrap Modal if it exists in the DOM
-        if (dom.modalElement) {
-            bsModal = new bootstrap.Modal(dom.modalElement);
-        }
+        
 
         // Attach Persistent Controls (Footer Buttons)
         dom.btnPrev.onclick = () => { let idx = getNextIndex(-1); if(idx !== -1) loadTrack(idx); };
@@ -121,7 +137,7 @@
         // Close player UI, pause playback, and restore original document title
         dom.btnClose.onclick = () => {
             dom.audio.pause();
-            dom.player.classList.add('d-none');
+            dom.player.style.display = 'none';
             // Reset page title on close
             document.title = dom.originalPageTitle || document.title;
         };
@@ -174,7 +190,7 @@
             
             // If the player is currently hidden (idle), reset the UI to the new album's first track
             // to provide context before the user presses play.
-            if (dom.player.classList.contains('d-none') && window.STARDUST_PLAYLIST.length > 0) {
+            if ((dom.player.style.display === 'none' || dom.player.classList.contains('d-none')) && window.STARDUST_PLAYLIST.length > 0) {
                 const first = window.STARDUST_PLAYLIST[0];
                 dom.title.innerText = "Ready to Play";
                 dom.artist.innerText = first.album; // Show Album Name as Artist initially
@@ -260,12 +276,13 @@
     function updateTracklistUI() {
         // Reset all rows across the document
         document.querySelectorAll('.track-row').forEach(row => {
-            row.classList.remove('bg-primary', 'bg-opacity-25');
+            row.style.backgroundColor = '';
+            row.style.color = '';
             // WCAG FIX: Remove the 'current' marker from inactive rows
             row.removeAttribute('aria-current');
             
             const icon = row.querySelector('.play-indicator');
-            if(icon) icon.className = 'fa-duotone fa-play-circle fs-4 text-primary opacity-50 play-indicator';
+            if(icon) { icon.innerHTML = '<i class="fa-duotone fa-play-circle" style="font-size: 1.5rem; opacity: 0.5;"></i>'; }
         });
 
         // Highlight active row (if it exists on current page view)
@@ -279,16 +296,17 @@
             const rowTitle = titleElement ? titleElement.innerText : activeRow.innerText;
             
             if (rowTitle.includes(currentTrack.title.trim())) {
-                 activeRow.classList.add('bg-primary', 'bg-opacity-25');
+                 activeRow.style.backgroundColor = 'var(--wa-color-primary-10, rgba(66, 170, 219, 0.15))';
                  
                  // WCAG FIX: Mark this row as the 'current' item for screen readers
                  activeRow.setAttribute('aria-current', 'true');
 
                  const icon = activeRow.querySelector('.play-indicator');
-                 if(icon) icon.className = 'spinner-border spinner-border-sm text-light play-indicator';
+                 if(icon) icon.innerHTML = '<wa-spinner size="small"></wa-spinner>';
+                 
                  // If playing, change spinner to volume icon
                  if (!dom.audio.paused) {
-                    if(icon) icon.className = 'fa-duotone fa-volume-high fs-4 text-white play-indicator';
+                    if(icon) { icon.innerHTML = '<i class="fa-duotone fa-volume-high" style="font-size: 1.5rem;"></i>'; }
                  }
             }
         }
@@ -310,14 +328,33 @@
         }
 
         currentIndex = index;
+        
         const track = playlist[index];
 
+        // --- ISRC DEDUPLICATION CHECK ---
+        // If the user clicks play on a track with the exact same ISRC as the one currently loaded,
+        // we do not interrupt playback or refetch the blob. We just sync the UI.
+        if (track.isrc && currentIsrc && track.isrc === currentIsrc) {
+            currentIndex = index;
+            updateTracklistUI();
+            
+            if (dom.audio.paused) {
+                dom.audio.play();
+            } else {
+                showToast("<strong>Continuous Playback:</strong><br>You are already listening to this exact recording.");
+            }
+            return;
+        }
+
+        currentIsrc = track.isrc || null;
+
+
         // UI Updates: Show player and set loading state
-        dom.player.classList.remove('d-none');
+        dom.player.style.display = 'block';
         
         // NOTE: Because we added aria-live='polite' in initEngine, 
         // this text change will be announced by the screen reader.
-        dom.title.innerHTML = `<span class="spinner-border spinner-border-sm text-primary me-2" aria-hidden="true"></span>Buffering...`;
+        dom.title.innerHTML = `<wa-spinner size="small" style="vertical-align: middle; margin-right: 0.5rem;" aria-hidden="true"></wa-spinner>Buffering...`;
         
         if(dom.artist) dom.artist.textContent = track.artist;
         dom.art.src = track.artwork;
@@ -343,12 +380,12 @@
                 // Injects specific styling based on the track's metadata 'tier'
                 let titleHtml = track.title;
                 if (track.legacyTier) {
-                    let badgeClass = 'bg-secondary text-white'; // Fallback
-                    if (track.legacyTier === 'Chart Smash') badgeClass = 'bg-success text-white';
-                    if (track.legacyTier === 'Fan Anthem') badgeClass = 'bg-warning text-dark';
-                    if (track.legacyTier === 'Deep Cut') badgeClass = 'bg-info text-dark';
-                    if (track.legacyTier === 'Vault Track') badgeClass = 'bg-dark text-warning border border-warning';
-                    if (track.legacyTier === 'The Dud' || track.legacyTier === 'Studio Filler') badgeClass = 'bg-danger text-white';
+                    let badgeVariant = 'neutral';
+                    if (track.legacyTier === 'Chart Smash') badgeVariant = 'success';
+                    if (track.legacyTier === 'Fan Anthem') badgeVariant = 'warning';
+                    if (track.legacyTier === 'Deep Cut') badgeVariant = 'brand';
+                    if (track.legacyTier === 'Vault Track') badgeVariant = 'neutral';
+                    if (track.legacyTier === 'The Dud' || track.legacyTier === 'Studio Filler') badgeVariant = 'danger';
 
                     // Prepare safe string for HTML attributes
                     let safeLore = track.loreNote ? track.loreNote.replace(/"/g, '&quot;') : '';
@@ -362,7 +399,7 @@
                         ? `title="${safeLore}" aria-label="Legacy Tier: ${track.legacyTier}. Lore Note: ${safeLore}" tabindex="0"`
                         : `aria-label="Legacy Tier: ${track.legacyTier}" tabindex="0"`;
 
-                    titleHtml += ` <span class="badge ${badgeClass} ms-2 align-text-bottom" style="font-size: 0.6em; letter-spacing: 0.5px; cursor: help;" ${wcagAttributes}><span aria-hidden="true">${track.legacyTier.toUpperCase()}</span></span>`;
+                    titleHtml += ` <wa-badge variant="${badgeVariant}" style="margin-left: 0.5rem; vertical-align: text-bottom; font-size: 0.7em; cursor: help;" ${wcagAttributes}><span aria-hidden="true">${track.legacyTier.toUpperCase()}</span></wa-badge>`;
                 }
                 
                 dom.title.innerHTML = titleHtml;
@@ -391,7 +428,7 @@
             })
             .catch(err => {
                 console.error("Playback Error:", err);
-                dom.title.innerHTML = `<span class="text-danger">Load Failed</span>`;
+                dom.title.innerHTML = `<span style="color: var(--wa-color-danger, red);">Load Failed</span>`;
             });
     };
 
@@ -400,7 +437,8 @@
      */
     function updateControlUI() {
         const rIcon = dom.btnRepeat.querySelector('i');
-        dom.btnRepeat.className = 'btn btn-sm ' + (repeatMode === 'none' ? 'btn-outline-secondary' : 'btn-outline-primary active');
+        dom.btnRepeat.style.opacity = (repeatMode === 'none' ? '0.5' : '1');
+        dom.btnRepeat.style.color = (repeatMode === 'none' ? '' : 'var(--wa-color-primary)');
         
         // ARIA: Add Pressed state for toggles
         dom.btnRepeat.setAttribute('aria-pressed', repeatMode !== 'none');
@@ -411,7 +449,8 @@
         else if (repeatMode === 'album') rIcon.className = 'fa-duotone fa-compact-disc';
         else rIcon.className = 'fa-solid fa-repeat';
         
-        dom.btnShuffle.className = 'btn btn-sm ' + (isShuffle ? 'btn-outline-primary active' : 'btn-outline-secondary');
+        dom.btnShuffle.style.opacity = (isShuffle ? '1' : '0.5');
+        dom.btnShuffle.style.color = (isShuffle ? 'var(--wa-color-primary)' : '');
         
         // Disable Prev/Next buttons conditionally if at boundaries
         dom.btnPrev.disabled = (repeatMode !== 'all' && repeatMode !== 'album' && !isShuffle && currentIndex === 0);
@@ -425,17 +464,17 @@
      * Attached to window to allow invocation from dynamically injected views.
      */
     window.openLyrics = function(title, url) {
-        if (!bsModal) return; // Guard if modal missing
+        if (!dom.modalElement) return; // Guard if modal missing
 
         // 1. Set Loading State
         dom.modalTitle.textContent = title;
         dom.modalContent.innerHTML = `
-            <div class="text-center py-5">
-                <div class="spinner-border text-primary" role="status"></div>
-                <p class="mt-2 font-monospace">Retrieving data from the Vault...</p>
+            <div style="text-align: center; padding: 3rem 0;">
+                <wa-spinner style="font-size: 2rem;"></wa-spinner>
+                <p style="margin-top: 1rem; font-family: monospace;">Retrieving data from the Vault...</p>
             </div>`;
         
-        bsModal.show();
+        dom.modalElement.showModal();
 
         // 2. Fetch MD File (with cache busting ?v=timestamp to ensure fresh lore)
         fetch(url + "?v=" + Date.now())
@@ -463,12 +502,12 @@
                     // Detect "**HEADER:**" pattern (e.g., **LORE NOTE:**)
                     if (firstLine.match(/^\*\*[A-Z ]+:\*\*$/)) {
                         let cleanHeader = firstLine.replace(/\*\*/g, ''); // Strip stars
-                        headerHtml = `<h4 class="text-warning fw-bold border-bottom border-secondary pb-2 mb-3 mt-2">${cleanHeader}</h4>`;
+                        headerHtml = `<h4 style="color: var(--wa-color-warning); font-weight: bold; border-bottom: 1px solid var(--wa-color-neutral-40); padding-bottom: 0.5rem; margin: 0.5rem 0 1rem 0;">${cleanHeader}</h4>`;
                         contentLines = lines.slice(1); // Remove header from body
                     }
                     // Detect "[Section Header]" pattern (e.g., [Chorus])
                     else if (firstLine.match(/^[\(\[].*?[\)\]]$/)) {
-                        headerHtml = `<h5 class="text-info fw-bold text-uppercase mb-2 mt-2">${firstLine}</h5>`;
+                        headerHtml = `<h5 style="color: var(--wa-color-primary, #42AADB); font-weight: bold; text-transform: uppercase; margin: 0.5rem 0;">${firstLine}</h5>`;
                         contentLines = lines.slice(1);
                     }
 
@@ -479,11 +518,11 @@
 
                         // 1. Handle Bold (**text** or __text__)
                         // Swap 'text-body' for a color that pops against your dark/light themes
-                        parsedLine = parsedLine.replace(/(\*\*|__)(.*?)\1/g, '<strong class="text-warning-emphasis fw-bold">$2</strong>');
+                        parsedLine = parsedLine.replace(/(\*\*|__)(.*?)\1/g, '<strong style="color: var(--wa-color-warning); font-weight: bold;">$2</strong>');
                         
                         // 2. Handle Italics (*text* or _text_)
                         // Note: We do this AFTER bold so the double asterisks are already converted!
-                        parsedLine = parsedLine.replace(/(\*|_)(.*?)\1/g, '<em class="text-body">$2</em>');
+                        parsedLine = parsedLine.replace(/(\*|_)(.*?)\1/g, '<em style="opacity: 0.9;">$2</em>');
 
                         // 3. (Optional) Handle Strikethrough (~~text~~)
                         parsedLine = parsedLine.replace(/~~(.*?)~~/g, '<del>$1</del>');
@@ -492,21 +531,21 @@
                     });
 
                     // Render block output
-                    if (contentLines.length === 0) return `<div class="mb-4">${headerHtml}</div>`;
+                    if (contentLines.length === 0) return `<div style="margin-bottom: 1.5rem;">${headerHtml}</div>`;
 
                     return `
-                        <div class="lyrics-block mb-4">
+                        <div class="lyrics-block" style="margin-bottom: 1.5rem;">
                             ${headerHtml}
                             <div style="line-height: 1.6;">${processedBody.join('<br>')}</div>
                         </div>`;
                 }).join('');
 
                 // 4. Render Final Content
-                dom.modalContent.innerHTML = `<div class="p-3">${htmlOutput}</div>`;
+                dom.modalContent.innerHTML = `<div style="padding: 1rem;">${htmlOutput}</div>`;
             })
             .catch(err => {
                 // Render error state
-                dom.modalContent.innerHTML = `<div class="alert alert-warning m-3">Data Corrupted. Unable to retrieve lyrics.</div>`;
+                dom.modalContent.innerHTML = `<div style="background-color: var(--wa-color-warning-10, #ffcc0022); color: var(--wa-color-warning); padding: 1rem; margin: 1rem; border-radius: 4px;">Data Corrupted. Unable to retrieve lyrics.</div>`;
             });
     };
 
