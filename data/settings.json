@@ -1,0 +1,49 @@
+{
+  "siteName": "Stardust Engine CMS",
+  "projectSlug": "stardust-engine-cms",
+  "cdnBaseUrl": "",
+  "fontAwesomeKit": "",
+  "webAwesomeKit": "",
+  "defaultTheme": "light",
+  "forceDarkThemes": [
+    "dark",
+    "space-theme",
+    "terminal"
+  ],
+  "activeModules": [
+    "stardust-player"
+  ],
+  "brandFont": [
+    "system-ui",
+    "-apple-system",
+    "sans-serif"
+  ],
+  "analytics": {
+    "provider": "google",
+    "trackingId": "",
+    "enabled": false
+  },
+  "defaults": {
+    "view": "errors/404",
+    "showSidebar": false,
+    "sidebar": "sidebar-default",
+    "ogTitle": "Stardust Engine CMS",
+    "ogDescription": "A blazing-fast, zero-database flat-file Content Management System powered by PHP 8.5 and the Elara Vanilla JS SPA Router.",
+    "ogImage": "/assets/images/og-default.svg",
+    "navbarBrandLogo": "",
+    "navbarBrandLogoDark": "",
+    "navbarBrandText": "Stardust Engine",
+    "navbarBrandLink": "/",
+    "navbarBrandAlt": "Stardust Engine Logo",
+    "navbarBrandClass": ""
+  },
+  "sidebarMap": {
+    "/project": "sidebar-default"
+  },
+  "headerMap": {
+    "/": "header-default"
+  },
+  "footerMap": {
+    "/": "footer-default"
+  }
+}

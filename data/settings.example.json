@@ -1,7 +1,9 @@
 {
   "siteName": "Stardust Engine CMS",
-  "projectSlug": "my-awesome-project",
-  "cdnBaseUrl": "https://cdn.example.com",
+  "projectSlug": "stardust-engine-cms",
+  "cdnBaseUrl": "",
+  "fontAwesomeKit": "",
+  "webAwesomeKit": "",
   "defaultTheme": "light",
   "forceDarkThemes": [
     "dark",
@@ -18,7 +20,7 @@
   ],
   "analytics": {
     "provider": "google",
-    "trackingId": "G-XXXXXXXXXX",
+    "trackingId": "",
     "enabled": false
   },
   "defaults": {
@@ -26,17 +28,17 @@
     "showSidebar": false,
     "sidebar": "sidebar-default",
     "ogTitle": "Stardust Engine CMS",
-    "ogDescription": "A blazing-fast, headless-capable Content Management System.",
-    "ogImage": "/assets/images/social-preview.jpg",
-    "navbarBrandLogo": "/assets/images/logo.png",
-    "navbarBrandLogoDark": "/assets/images/logo-dark.png",
+    "ogDescription": "A blazing-fast, zero-database flat-file Content Management System powered by PHP 8.5 and the Elara Vanilla JS SPA Router.",
+    "ogImage": "/assets/images/og-default.svg",
+    "navbarBrandLogo": "",
+    "navbarBrandLogoDark": "",
     "navbarBrandText": "Stardust Engine",
     "navbarBrandLink": "/",
-    "navbarBrandAlt": "Site Logo",
-    "navbarBrandClass": "rounded-circle"
+    "navbarBrandAlt": "Stardust Engine Logo",
+    "navbarBrandClass": ""
   },
   "sidebarMap": {
-    "/docs": "sidebar-docs"
+    "/project": "sidebar-default"
   },
   "headerMap": {
     "/": "header-default"

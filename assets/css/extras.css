@@ -5,28 +5,26 @@
  *
  * PURPOSE:
  * Provides supplemental CSS utility classes for narrative-driven UI components.
- * This includes text glows, HUD (Heads Up Display) panel overlays, and custom
- * UI pills that integrate seamlessly with the Bootstrap 5 environment.
+ * This includes text glows, HUD (Heads Up Display) panel overlays, hover lifts,
+ * and custom UI pills that integrate seamlessly with the Bootstrap 5 environment.
  *
  * ARCHITECTURAL ROLE:
  * Included globally via the main layout template. It acts as an extension to
- * the core Bootstrap utility classes, enabling rapid styling of lore-heavy
- * sections without polluting the core layout stylesheets.
+ * the core Bootstrap utility classes, enabling rapid styling of narrative or
+ * documentation sections without polluting the core layout stylesheets.
  *
  * KEY COMPONENTS:
  * - Glow Utilities: `.text-glow-primary`, `.border-glow`, `.shadow-glow` use
  *   CSS filters and box-shadows to simulate neon/holographic emissions.
  * - The Glass HUD System: `.bg-hud-*` classes generate frosted-glass style
- *   panels using `backdrop-filter: blur()`. These classes force child text
- *   colors to white to maintain WCAG contrast against the semi-transparent
- *   colored backgrounds.
+ *   panels using `backdrop-filter: blur()`. Adaptive foreground colors ensure
+ *   strict WCAG 2.1 AA contrast in both Light Mode and Dark Mode.
+ * - Hover Lift: `.hover-lift` provides smooth micro-interaction elevation on cards.
  * - Bootstrap Backfills: Fixes omissions in Bootstrap 5's blockquote styling.
  *
  * MAINTENANCE NOTES:
  * - The `.bg-hud-*` system relies heavily on CSS variables (`--bs-info-rgb`, etc.)
  *   inherited from the active Bootstrap theme. Do not hardcode HEX colors here.
- * - `backdrop-filter` performance can degrade on low-end mobile devices if
- *   applied to massive full-page containers. Use on specific components.
  * ============================================================================
  */
 
@@ -48,41 +46,60 @@
     box-shadow: 0 5px 15px rgba(var(--bs-primary-rgb), 0.25);
 }
 
-/* --- The Glass HUD System --- */
-/* Semi-transparent colored glass that forces light text globally */
+/* --- Card Micro-Interactions --- */
+.hover-lift {
+    transition: transform 0.2s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.2s ease;
+}
 
+.hover-lift:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 0.75rem 1.5rem rgba(0, 0, 0, 0.15) !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .hover-lift {
+        transition: none !important;
+    }
+    .hover-lift:hover {
+        transform: none !important;
+    }
+}
+
+/* --- The Glass HUD System (Adaptive Light/Dark Mode WCAG Compliance) --- */
 .bg-hud-blue {
-    background-color: rgba(var(--bs-info-rgb), 0.15);
-    border: 1px solid rgba(var(--bs-info-rgb), 0.3);
-    backdrop-filter: blur(5px);
-    color: #ffffff !important;
+    background-color: rgba(var(--bs-info-rgb), 0.12);
+    border: 1px solid rgba(var(--bs-info-rgb), 0.35);
+    backdrop-filter: blur(6px);
+    color: var(--bs-body-color) !important;
 }
 
 .bg-hud-green {
-    background-color: rgba(var(--bs-success-rgb), 0.15);
-    border: 1px solid rgba(var(--bs-success-rgb), 0.3);
-    backdrop-filter: blur(5px);
-    color: #ffffff !important;
+    background-color: rgba(var(--bs-success-rgb), 0.12);
+    border: 1px solid rgba(var(--bs-success-rgb), 0.35);
+    backdrop-filter: blur(6px);
+    color: var(--bs-body-color) !important;
 }
 
 .bg-hud-red {
-    background-color: rgba(var(--bs-danger-rgb), 0.15);
-    border: 1px solid rgba(var(--bs-danger-rgb), 0.3);
-    backdrop-filter: blur(5px);
-    color: #ffffff !important;
+    background-color: rgba(var(--bs-danger-rgb), 0.12);
+    border: 1px solid rgba(var(--bs-danger-rgb), 0.35);
+    backdrop-filter: blur(6px);
+    color: var(--bs-body-color) !important;
 }
 
 .bg-hud-orange {
-    background-color: rgba(var(--bs-warning-rgb), 0.15);
-    border: 1px solid rgba(var(--bs-warning-rgb), 0.3);
-    backdrop-filter: blur(5px);
-    color: #ffffff !important;
+    background-color: rgba(var(--bs-warning-rgb), 0.12);
+    border: 1px solid rgba(var(--bs-warning-rgb), 0.35);
+    backdrop-filter: blur(6px);
+    color: var(--bs-body-color) !important;
 }
 
-/* Force muted text inside HUDs to remain readable */
+/* Ensure muted text inside HUDs remains readable in both modes */
 .bg-hud-blue .text-muted, .bg-hud-green .text-muted, 
-.bg-hud-red .text-muted, .bg-hud-orange .text-muted {
-    color: rgba(255, 255, 255, 0.7) !important; 
+.bg-hud-red .text-muted, .bg-hud-orange .text-muted,
+.bg-hud-blue .text-body-secondary, .bg-hud-green .text-body-secondary,
+.bg-hud-red .text-body-secondary, .bg-hud-orange .text-body-secondary {
+    color: var(--bs-secondary) !important; 
 }
 
 /* --- Bootstrap Utilities Backfill --- */
@@ -93,7 +110,7 @@
     margin-top: -1rem;
     margin-bottom: 1rem;
     font-family: inherit; 
-    opacity: 0.8;
+    opacity: 0.85;
 }
 .blockquote-footer::before {
     content: "\2014\00A0"; 
@@ -110,7 +127,7 @@
     padding: 0.4em 0.85em;
     margin-right: 0.35rem;
     margin-bottom: 0.35rem;
-    background-color: rgba(128, 128, 128, 0.05);
+    background-color: rgba(128, 128, 128, 0.08);
     border: 1px solid var(--bs-border-color);
     color: var(--bs-body-color);
     border-radius: 50rem;
@@ -118,7 +135,7 @@
     cursor: default;
 }
 .data-pill:hover {
-    background-color: rgba(var(--bs-primary-rgb), 0.1);
+    background-color: rgba(var(--bs-primary-rgb), 0.12);
     border-color: var(--bs-primary);
     transform: translateY(-1px);
     color: var(--bs-primary);

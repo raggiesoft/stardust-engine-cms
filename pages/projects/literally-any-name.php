@@ -8,22 +8,8 @@
  * This view serves strictly as a demonstrative tool to explain the CMS's 
  * decoupled routing architecture. It proves that the physical file name 
  * (`literally-any-name.php`) has no forced correlation to the public-facing URL.
- * 
- * CORE RESPONSIBILITIES:
- * 1. Educational Content: Explains the difference between traditional flat-file 
- *    CMS routing and Stardust's JSON-based mapping.
- * 2. Code Presentation: Utilizes Bootstrap UI components to display a code 
- *    snippet demonstrating the configuration block required to route a semantic 
- *    URL to an abstractly named file.
- * 
- * USAGE INSTRUCTIONS:
- * - This file can be safely deleted in production environments.
- * - Review this file to understand how to structure the `routes.json` file 
- *   located in the `data/routes/` directory.
  * ============================================================================
  */
-// pages/project/literally-any-name.php
-// This file demonstrates the complete decoupling of URLs and physical files.
 ?>
 
 <div class="container py-4">
@@ -33,52 +19,49 @@
       <ol class="breadcrumb">
         <li class="breadcrumb-item"><a href="/" class="text-decoration-none">Home</a></li>
         <li class="breadcrumb-item"><a href="/project" class="text-decoration-none">Project</a></li>
-        <li class="breadcrumb-item active" aria-current="page">Custom Routing</li>
+        <li class="breadcrumb-item active" aria-current="page">Decoupled Route Mapping</li>
       </ol>
     </nav>
 
     <!-- Header Section -->
     <div class="row mb-5">
         <div class="col-12">
-            <h1 class="display-5 fw-bold text-body-emphasis mb-3">Decoupled Architecture</h1>
+            <h1 class="display-5 fw-bold text-body-emphasis mb-3">Decoupled Route Architecture</h1>
             <p class="lead text-body-secondary">
-                You are currently viewing a physical file named <code>literally-any-name.php</code>, but your browser URL is clean and semantic.
+                You are currently viewing a physical file named <code>pages/projects/literally-any-name.php</code>, while your browser URL remains clean and semantic at <code>/project/secret-page</code>.
             </p>
         </div>
     </div>
 
     <!-- Educational Grid Section -->
     <div class="row g-4">
-        
-        <!-- Explanation: The URL limitation in traditional CMS -->
         <div class="col-md-6">
-            <div class="card h-100 border-0 shadow-sm bg-body-tertiary">
+            <div class="card h-100 border-secondary-subtle shadow-sm bg-body-tertiary">
                 <div class="card-body p-4">
                     <h2 class="h5 fw-bold mb-3">
-                        <i class="fa-solid fa-link text-primary me-2" aria-hidden="true"></i>The URL
+                        <i class="fa-solid fa-link text-primary me-2" aria-hidden="true"></i>The Public URL
                     </h2>
                     <p>
-                        In a traditional flat-file CMS, visiting <code>/project/secret-page</code> means the server must have a folder named <code>project</code> containing a file named <code>secret-page.php</code>. 
+                        In a traditional flat-file CMS, visiting <code>/project/secret-page</code> requires a folder named <code>project</code> containing a file named <code>secret-page.php</code>. 
                     </p>
                     <p class="mb-0">
-                        The Stardust Engine router completely bypasses this limitation.
+                        The Stardust Engine front-controller completely decouples public URLs from physical filesystem paths.
                     </p>
                 </div>
             </div>
         </div>
 
-        <!-- Explanation: The JSON Solution in Stardust -->
         <div class="col-md-6">
-            <div class="card h-100 border-0 shadow-sm bg-body-tertiary">
+            <div class="card h-100 border-secondary-subtle shadow-sm bg-body-tertiary">
                 <div class="card-body p-4">
                     <h2 class="h5 fw-bold mb-3">
-                        <i class="fa-solid fa-file-code text-success me-2" aria-hidden="true"></i>The JSON Map
+                        <i class="fa-solid fa-file-code text-success me-2" aria-hidden="true"></i>The JSON Route Map
                     </h2>
                     <p>
-                        Because the engine relies on <code>routes.json</code>, you can name your internal PHP fragments whatever makes the most sense for your development workflow. 
+                        Because the engine resolves routes via <code>data/routes/*.json</code>, you can organize your internal PHP view fragments however best suits your engineering workflow.
                     </p>
                     <p class="mb-0">
-                        You simply tell the configuration exactly which view to load for which route.
+                        Simply map the public route key to any relative view path inside your JSON route file.
                     </p>
                 </div>
             </div>
@@ -88,17 +71,16 @@
     <!-- Code Snippet Display Section -->
     <div class="row mt-5">
         <div class="col-12">
-            <div class="card shadow-sm border-secondary border-opacity-25">
-                <div class="card-header bg-secondary bg-opacity-10 fw-bold font-monospace">
-                    <i class="fa-brands fa-js me-2" aria-hidden="true"></i>data/routes/routes.example.json
+            <div class="card shadow-sm border-secondary-subtle">
+                <div class="card-header bg-body-tertiary fw-bold font-monospace">
+                    <i class="fa-solid fa-code me-2 text-primary" aria-hidden="true"></i>data/routes/routes.json
                 </div>
                 <div class="card-body p-0">
-<!-- Preformatted code block showcasing JSON configuration -->
 <pre class="m-0 p-4 font-monospace bg-dark text-light overflow-auto" style="border-bottom-left-radius: var(--bs-card-inner-border-radius); border-bottom-right-radius: var(--bs-card-inner-border-radius);">
 <code>"/project/secret-page": {
-  "view": "pages/project/literally-any-name",
-  "title": "Decoupled Architecture | Stardust Engine",
-  "ogDescription": "Demonstrating how URLs detach from physical file names."
+  "view": "pages/projects/literally-any-name",
+  "title": "Decoupled Architecture | Stardust Engine CMS",
+  "ogDescription": "Demonstrating how public URLs detach cleanly from physical file names."
 }</code>
 </pre>
                 </div>

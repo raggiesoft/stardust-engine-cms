@@ -2,60 +2,51 @@
 /**
  * ============================================================================
  * COMPONENT: _tracklist-downloader.php
- * VERSION: 10.3 (Schema.org Deep Metadata, Store Routing & DSP Exemption Logic)
+ * VERSION: 11.0 (Open-Source CMS Edition — Local & CDN Hybrid Resolution)
  *
  * PURPOSE:
- * Generates the tracklist interface for albums, handles streaming link routing,
- * manages Schema.org metadata integration, and controls access to digital archives
- * (including vault paywall logic and DSP exemptions).
+ * Generates the interactive tracklist interface for albums, handles streaming
+ * link routing, manages Schema.org metadata integration, and dispatches the
+ * tracklist payload to `stardust-player.js` via the `stardust:playlist-update` event.
  *
  * ARCHITECTURAL ROLE:
- * Acts as a view component that processes JSON metadata (from track/album endpoints)
- * and dynamically renders the album's tracklist UI, DSP links, and download options
- * within the Stardust Engine CMS.
- *
- * KEY COMPONENTS:
- * - Metadata Processing: Loads `tracks.json`, `album.json`, and `albums.json` to 
- *   determine tracks, lore, and global store routing.
- * - Schema.org Translation: Maps custom release/production types to standard formats.
- * - DSP Routing: Calculates links for Spotify, Apple, etc., or applies exemptions.
- * - Player Integration: Exposes the generated tracklist via a JS event `stardust:playlist-update`.
- *
- * MAINTENANCE NOTES:
- * - If modifying JSON payload structures, ensure backwards compatibility with `albums_master_content`.
- * - Do not remove the `license-gate` class on download links without updating vault security rules.
+ * Resolves `tracks.json` and `album.json` from the local filesystem first
+ * (`ROOT_PATH . $album_path_web`) so cloned repositories work out-of-the-box
+ * with zero external CDN dependencies, and seamlessly falls back to `$cdnBaseUrl`
+ * when configured for production edge storage.
  *
  * LICENSE:
- * The architecture and code of this file are licensed under the MIT License.
- * Copyright (c) 2026 Michael P. Ragsdale / RaggieSoft
- * * The underlying narrative, lore, and music tracks delivered by this component 
- * are licensed under Creative Commons Attribution-ShareAlike 4.0 International (CC BY-SA 4.0),
- * except where commercial distribution exemptions apply (e.g., DSP streaming links).
+ * Released under the MIT License.
  * ============================================================================
  */
 
-// ==============================================================================
-//  FEATURE FLAG: THE VAULT PAYWALL
-// ==============================================================================
 $vault_active = false; 
-$vault_under_construction = true; // Set to TRUE to hide ONLY the massive master files temporarily
-// ==============================================================================
+$vault_under_construction = true;
 
-$base_web_path = 'https://assets.raggiesoft.com' . $album_path_web;
-$tracks_json_url = $base_web_path . '/tracks.json?v=' . time();
-$album_json_url = $base_web_path . '/album.json?v=' . time();
+// Resolve local filesystem path first, then fallback to $cdnBaseUrl if configured
+$local_album_dir = defined('ROOT_PATH') ? ROOT_PATH . $album_path_web : '';
+$cdn_root = !empty($cdnBaseUrl) ? rtrim($cdnBaseUrl, '/') : '';
+$base_web_path = $cdn_root . $album_path_web;
 
-$tracks_json_content = @file_get_contents($tracks_json_url);
-$album_json_content = @file_get_contents($album_json_url);
+if ($local_album_dir && file_exists($local_album_dir . '/tracks.json') && file_exists($local_album_dir . '/album.json')) {
+    $tracks_json_content = file_get_contents($local_album_dir . '/tracks.json');
+    $album_json_content = file_get_contents($local_album_dir . '/album.json');
+    $base_web_path = $album_path_web;
+} else {
+    $tracks_json_url = $base_web_path . '/tracks.json?v=' . time();
+    $album_json_url = $base_web_path . '/album.json?v=' . time();
+    $tracks_json_content = @file_get_contents($tracks_json_url);
+    $album_json_content = @file_get_contents($album_json_url);
+}
 
 if ($tracks_json_content === false || $album_json_content === false) {
-    echo '<div class="alert alert-danger"><strong>Error:</strong> Tracklist data not found on CDN.</div>';
+    echo '<div class="alert alert-warning border-warning"><i class="fa-solid fa-triangle-exclamation me-2" aria-hidden="true"></i><strong>Tracklist Notice:</strong> Tracklist metadata (<code>tracks.json</code> / <code>album.json</code>) was not found at <code>' . htmlspecialchars($album_path_web) . '</code>.</div>';
     return;
 }
 
 $tracks_data = json_decode($tracks_json_content, true);
 $album_data = json_decode($album_json_content, true);
-$raw_tracks = $tracks_data['tracks'];
+$raw_tracks = $tracks_data['tracks'] ?? [];
 
 if (!function_exists('get_web_safe_title')) {
     function get_web_safe_title($title) {
@@ -73,17 +64,14 @@ if (!function_exists('get_archive_name')) {
     }
 }
 
-// --- TIMELINE LOGIC (SCHEMA.ORG INTEGRATION) ---
-$narrative_date = !empty($album_data['temporalCoverage']) ? $album_data['temporalCoverage'] : '1900-01-01';
+// --- TIMELINE & RELEASE METADATA (SCHEMA.ORG INTEGRATION) ---
+$narrative_date = !empty($album_data['temporalCoverage']) ? $album_data['temporalCoverage'] : '1989-01-01';
 $real_release_date = !empty($album_data['datePublished']) ? $album_data['datePublished'] : 'TBA';
 
 $narrative_year = substr($narrative_date, 0, 4);
-$real_release_year = $real_release_date !== 'TBA' ? substr(trim($real_release_date), -4) : 'TBA';
-
-$album_name = isset($album_data['name']) ? $album_data['name'] : 'Unknown Album';
+$album_name = $album_data['name'] ?? 'Sample Album';
 $archive_base_name = get_archive_name($album_name, $narrative_year);
 
-// --- METADATA TRANSLATION (SCHEMA.ORG INTEGRATION) ---
 $raw_release_type = isset($album_data['albumReleaseType']) ? basename($album_data['albumReleaseType']) : 'AlbumRelease';
 $raw_production_type = isset($album_data['albumProductionType']) ? basename($album_data['albumProductionType']) : 'StudioAlbum';
 $album_upc = !empty($album_data['gtin12']) ? $album_data['gtin12'] : (!empty($album_data['identifier']) ? $album_data['identifier'] : null);
@@ -104,10 +92,10 @@ $production_map = [
     'StudioAlbum' => 'Studio Album'
 ];
 
-$friendly_release = isset($release_map[$raw_release_type]) ? $release_map[$raw_release_type] : 'Full Length';
-$friendly_production = isset($production_map[$raw_production_type]) ? $production_map[$raw_production_type] : 'Studio Album';
+$friendly_release = $release_map[$raw_release_type] ?? 'Full Length';
+$friendly_production = $production_map[$raw_production_type] ?? 'Studio Album';
 
-// --- DSP STREAMING IDS & STORE LINKS (SINGLE SOURCE OF TRUTH) ---
+// --- DSP STREAMING IDS & STORE LINKS ---
 $stream_spotify_id = '';
 $stream_apple_id   = '';
 $stream_amazon_id  = '';
@@ -117,78 +105,84 @@ $store_audiophile_url = '';
 $dsp_exempt = false;
 $dsp_notice = '';
 
-// Step up one directory from the album path to target the artist's root folder
 $artist_path_web = dirname($album_path_web);
-$albums_master_url = 'https://assets.raggiesoft.com' . $artist_path_web . '/albums.json?v=' . time();
-$albums_master_content = @file_get_contents($albums_master_url);
+$local_master_json = defined('ROOT_PATH') ? ROOT_PATH . $artist_path_web . '/albums.json' : '';
+if ($local_master_json && file_exists($local_master_json)) {
+    $albums_master_content = file_get_contents($local_master_json);
+} elseif (!empty($cdn_root)) {
+    $albums_master_content = @file_get_contents($cdn_root . $artist_path_web . '/albums.json?v=' . time());
+} else {
+    $albums_master_content = false;
+}
 
 if ($albums_master_content !== false) {
     $master_data = json_decode($albums_master_content, true);
     $current_slug = basename($album_path_web);
     
-    foreach ($master_data as $era) {
-        if (!empty($era['albums'])) {
-            foreach ($era['albums'] as $master_album) {
-                // Match by explicitly defined folder, URL slug, or exact Album Name
-                $check_slug = isset($master_album['folder']) ? $master_album['folder'] : basename($master_album['url']);
-                
-                if ($check_slug === $current_slug || $master_album['title'] === $album_name) {
-                    $stream_spotify_id = $master_album['spotifyId'] ?? '';
-                    $stream_apple_id   = $master_album['appleId'] ?? '';
-                    $stream_amazon_id  = $master_album['amazonId'] ?? '';
-                    $stream_youtube_id = $master_album['youtubeId'] ?? '';
-                    
-                    // Pull the Fourthwall Store URLs
-                    $store_standard_url = $master_album['storeStandardUrl'] ?? '';
-                    $store_audiophile_url = $master_album['storeAudiophileUrl'] ?? '';
-                    
-                    // Check for DSP exemptions
-                    $dsp_exempt = $master_album['dspExempt'] ?? false;
-                    $dsp_notice = $master_album['dspNotice'] ?? 'This release is intentionally withheld from commercial streaming algorithms.';
-                    break 2; // Match found, break out of both loops
+    if (is_array($master_data)) {
+        foreach ($master_data as $era) {
+            if (!empty($era['albums'])) {
+                foreach ($era['albums'] as $master_album) {
+                    $check_slug = $master_album['folder'] ?? basename($master_album['url'] ?? '');
+                    if ($check_slug === $current_slug || ($master_album['title'] ?? '') === $album_name) {
+                        $stream_spotify_id = $master_album['spotifyId'] ?? '';
+                        $stream_apple_id   = $master_album['appleId'] ?? '';
+                        $stream_amazon_id  = $master_album['amazonId'] ?? '';
+                        $stream_youtube_id = $master_album['youtubeId'] ?? '';
+                        $store_standard_url = $master_album['storeStandardUrl'] ?? '';
+                        $store_audiophile_url = $master_album['storeAudiophileUrl'] ?? '';
+                        $dsp_exempt = $master_album['dspExempt'] ?? false;
+                        $dsp_notice = $master_album['dspNotice'] ?? 'This release is intentionally withheld from commercial streaming platforms.';
+                        break 2;
+                    }
                 }
             }
         }
     }
 }
 
-$has_active_streams = !empty($stream_spotify_id) || !empty($stream_apple_id) || !empty($stream_amazon_id) || !empty($stream_youtube_id);
-// ----------------------
+// Resolve artwork path (supports SVG or JPG)
+if ($local_album_dir && file_exists($local_album_dir . '/album-art.svg')) {
+    $album_art_url = $base_web_path . '/album-art.svg';
+} else {
+    $album_art_url = $base_web_path . '/album-art.jpg';
+}
 
-$album_art_url = $base_web_path . "/album-art.jpg?v=" . time();
 $js_playlist = []; 
 ?>
 <script type="application/ld+json">
     <?php echo $album_json_content; ?>
 </script>
-<div class="card bg-body-tertiary border-secondary-subtle mb-5 shadow-sm">
-    <div class="card-body p-3">
+
+<!-- Album Metadata Summary Card -->
+<div class="card bg-body-tertiary border-secondary-subtle mb-4 shadow-sm">
+    <div class="card-body p-3 p-md-4">
         
         <div class="row g-2 align-items-center border-bottom border-secondary-subtle pb-3 mb-3">
             <div class="col-12 col-md-6">
                 <div class="text-body fs-6 mb-2">
-                    <i class="fa-solid fa-timeline me-2 text-info"></i> <strong>Narrative Era:</strong> <span class="badge bg-info text-dark ms-1" style="font-size: 0.9em;"><?php echo htmlspecialchars($narrative_year); ?></span>
+                    <i class="fa-solid fa-timeline me-2 text-primary" aria-hidden="true"></i> <strong>Recording Era:</strong> <span class="badge bg-primary-subtle text-primary-emphasis ms-1"><?php echo htmlspecialchars($narrative_year); ?></span>
                 </div>
                 <div class="text-body fs-6">
-                    <i class="fa-solid fa-record-vinyl me-2 text-warning"></i> <strong>Format:</strong> <span class="badge bg-dark text-warning ms-1" style="font-size: 0.9em; border: 1px solid var(--bs-warning);"><?php echo htmlspecialchars($friendly_production); ?></span>
+                    <i class="fa-solid fa-record-vinyl me-2 text-warning" aria-hidden="true"></i> <strong>Format:</strong> <span class="badge bg-warning-subtle text-warning-emphasis ms-1"><?php echo htmlspecialchars($friendly_production); ?></span>
                 </div>
             </div>
             
             <div class="col-12 col-md-6 text-md-end">
                 <div class="text-body fs-6 mb-2">
-                    <i class="fa-solid fa-calendar-check me-2 text-success"></i> <strong>DSP Release:</strong> <span class="badge bg-success-subtle text-success-emphasis ms-1" style="font-size: 0.9em; border: 1px solid var(--bs-success-border-subtle);"><?php echo htmlspecialchars($real_release_date); ?></span>
+                    <i class="fa-solid fa-calendar-check me-2 text-success" aria-hidden="true"></i> <strong>Release Date:</strong> <span class="badge bg-success-subtle text-success-emphasis ms-1"><?php echo htmlspecialchars($real_release_date); ?></span>
                 </div>
                 <div class="text-body fs-6">
-                    <i class="fa-solid fa-music me-2 text-primary"></i> <strong>Length:</strong> <span class="badge bg-primary-subtle text-primary-emphasis ms-1 me-2" style="font-size: 0.9em; border: 1px solid var(--bs-primary-border-subtle);"><?php echo htmlspecialchars($friendly_release); ?></span>
+                    <i class="fa-solid fa-music me-2 text-info" aria-hidden="true"></i> <strong>Length:</strong> <span class="badge bg-info-subtle text-info-emphasis ms-1 me-2"><?php echo htmlspecialchars($friendly_release); ?></span>
                     <?php if ($album_upc): ?>
-                        <span class="badge bg-secondary-subtle text-secondary-emphasis" style="font-size: 0.85em; border: 1px solid var(--bs-secondary-border-subtle);" title="Universal Product Code">UPC: <?php echo htmlspecialchars($album_upc); ?></span>
+                        <span class="badge bg-secondary-subtle text-secondary-emphasis" title="Universal Product Code">UPC: <?php echo htmlspecialchars($album_upc); ?></span>
                     <?php endif; ?>
                 </div>
             </div>
         </div>
         
         <?php if (!empty($album_data['description'])): ?>
-        <div class="mt-3 mb-2 px-3 py-2 border-start border-3 border-primary bg-body rounded-end">
+        <div class="mt-2 mb-2 px-3 py-2 border-start border-3 border-primary bg-body rounded-end">
             <p class="mb-0 fst-italic text-body-secondary small">
                 <?php echo htmlspecialchars($album_data['description']); ?>
             </p>
@@ -196,94 +190,17 @@ $js_playlist = [];
         <?php endif; ?>
 
         <div class="d-flex align-items-start mt-3">
-            <i class="fa-solid fa-circle-info text-secondary mt-1 me-3 fs-5"></i>
+            <i class="fa-solid fa-circle-info text-primary mt-1 me-3 fs-5" aria-hidden="true"></i>
             <p class="small text-body-secondary mb-0 lh-sm">
-                <strong>ARCHIVIST NOTE:</strong> <em>The Stardust Engine</em> is a narrative-driven musical universe. The <strong>Narrative Era</strong> denotes when the album was recorded by Ryan and Cassidy within the fictional history of the band. The <strong>DSP Release</strong> reflects the legal copyright date when the audio files were officially pressed and distributed to global streaming platforms.
+                <strong>MODULE ARCHITECTURE NOTE:</strong> This component reads Schema.org-compliant <code>album.json</code> and <code>tracks.json</code> files directly from disk or an edge CDN, injects JSON-LD structured data into the document head, and dispatches the playlist state to the persistent <code>stardust-player.js</code> audio engine.
             </p>
         </div>
     </div>
 </div>
 
-<div class="card border-secondary mb-4 bg-transparent">
-    <div class="card-header bg-body-tertiary border-secondary d-flex justify-content-between align-items-center">
-        <h5 class="mb-0 text-uppercase"><i class="fa-solid fa-headphones me-2"></i>Stream the Album</h5>
-    </div>
-    <div class="card-body">
-        <?php if ($dsp_exempt): ?>
-            <div class="alert alert-warning border-warning bg-warning-subtle text-warning-emphasis py-2 px-3 mb-0" role="alert">
-                <i class="fa-solid fa-triangle-exclamation me-2"></i><strong>VAULT EXCLUSIVE:</strong> <?php echo htmlspecialchars($dsp_notice); ?>
-            </div>
-        <?php else: ?>
-            <?php if ($has_active_streams): ?>
-                <p class="text-success small mb-3"><strong>Support the band!</strong> Listen to the official release on your favorite streaming platform below.</p>
-            <?php else: ?>
-                <p class="text-muted small mb-3">Links will become active once the album clears the global distribution network.</p>
-            <?php endif; ?>
-
-            <div class="d-flex gap-2 flex-wrap">
-                <?php if (!empty($stream_spotify_id)): ?>
-                    <a href="https://open.spotify.com/album/<?php echo htmlspecialchars($stream_spotify_id); ?>" target="_blank" class="btn btn-outline-success"><i class="fa-brands fa-spotify me-2"></i>Spotify</a>
-                <?php else: ?>
-                    <a href="#" class="btn btn-outline-success disabled"><i class="fa-brands fa-spotify me-2"></i>Spotify</a>
-                <?php endif; ?>
-                
-                <?php if (!empty($stream_apple_id)): ?>
-                    <a href="https://music.apple.com/us/album/<?php echo htmlspecialchars($stream_apple_id); ?>" target="_blank" class="btn btn-outline-danger"><i class="fa-brands fa-apple me-2"></i>Apple Music</a>
-                <?php else: ?>
-                    <a href="#" class="btn btn-outline-danger disabled"><i class="fa-brands fa-apple me-2"></i>Apple Music</a>
-                <?php endif; ?>
-
-                <?php if (!empty($stream_amazon_id)): ?>
-                    <a href="https://music.amazon.com/albums/<?php echo htmlspecialchars($stream_amazon_id); ?>" target="_blank" class="btn btn-outline-info"><i class="fa-brands fa-amazon me-2"></i>Amazon Music</a>
-                <?php else: ?>
-                    <a href="#" class="btn btn-outline-info disabled"><i class="fa-brands fa-amazon me-2"></i>Amazon Music</a>
-                <?php endif; ?>
-
-                <?php if (!empty($stream_youtube_id)): ?>
-                    <a href="https://music.youtube.com/playlist?list=<?php echo htmlspecialchars($stream_youtube_id); ?>" target="_blank" class="btn btn-outline-danger"><i class="fa-brands fa-youtube me-2"></i>YouTube Music</a>
-                <?php else: ?>
-                    <a href="#" class="btn btn-outline-danger disabled"><i class="fa-brands fa-youtube me-2"></i>YouTube Music</a>
-                <?php endif; ?>
-            </div>
-        <?php endif; ?>
-    </div>
-</div>
-
-<div class="card border-secondary mb-5 bg-transparent">
-    <div class="card-header bg-body-tertiary border-secondary d-flex justify-content-between align-items-center">
-        <h5 class="mb-0 text-uppercase"><i class="fa-duotone fa-vault me-2"></i>Digital Archives & Studio Masters</h5>
-        <div>
-            <span class="badge bg-secondary me-2" title="Creative Commons Attribution-ShareAlike 4.0 International">CC BY-SA 4.0</span>
-        </div>
-    </div>
-    <div class="card-body">
-        <p class="text-muted small mb-3">Support the band and own the master tapes. High-fidelity payloads are available directly from the Engine Room storefront.</p>
-        
-        <div class="d-flex gap-2 flex-wrap">
-            <?php if (!empty($store_standard_url)): ?>
-                <a href="<?php echo htmlspecialchars($store_standard_url); ?>" target="_blank" class="btn btn-outline-info">
-                    <i class="fa-solid fa-file-zipper me-2"></i>Standard Archive (MP3/OGG)
-                </a>
-            <?php endif; ?>
-            
-            <?php if (!empty($store_audiophile_url)): ?>
-                <a href="<?php echo htmlspecialchars($store_audiophile_url); ?>" target="_blank" class="btn btn-outline-warning">
-                    <i class="fa-solid fa-waveform-lines me-2"></i>Audiophile Vault (WAV)
-                </a>
-            <?php endif; ?>
-
-            <?php if (empty($store_standard_url) && empty($store_audiophile_url)): ?>
-                <span class="btn btn-outline-secondary disabled">
-                    <i class="fa-solid fa-clock me-2"></i>Archives Pending Processing
-                </span>
-            <?php endif; ?>
-        </div>
-    </div>
-</div>
-
-<h3 class="h4 fw-bold text-uppercase text-muted mb-3">
-    <i class="fa-duotone fa-list-music me-2"></i>Tracklist & Lyrics
-</h3>
+<h2 class="h4 fw-bold text-uppercase text-body-secondary mb-3">
+    <i class="fa-solid fa-list-ul me-2 text-primary" aria-hidden="true"></i>Tracklist &amp; Markdown Lyrics
+</h2>
 
 <div class="tracklist-wrapper mb-5">
     <?php 
@@ -292,72 +209,61 @@ $js_playlist = [];
     $is_list_open = false;
 
     foreach ($raw_tracks as $index => $track): 
-        
-        $disc = isset($track['disc']) ? $track['disc'] : 1;
-        $disc_name = isset($track['discName']) ? $track['discName'] : '';
-        $suite_name = isset($track['suiteName']) ? $track['suiteName'] : '';
-        $isrc_code = isset($track['isrc']) ? $track['isrc'] : '';
+        $disc = $track['disc'] ?? 1;
+        $disc_name = $track['discName'] ?? '';
+        $suite_name = $track['suiteName'] ?? '';
+        $isrc_code = $track['isrc'] ?? '';
 
-        // ==========================================
-        // DISC HEADER LOGIC
-        // ==========================================
+        // Disc Header Logic
         if ($disc !== $current_disc) {
             if ($is_list_open) {
-                echo '</div>'; // Close previous list-group
+                echo '</div>';
             }
             $current_disc = $disc;
-            $current_suite = null; // Reset suite on new disc
+            $current_suite = null;
             
-            $display_disc_name = !empty($disc_name) ? " — <span class='text-body-secondary fs-5'>" . htmlspecialchars($disc_name) . "</span>" : "";
+            $display_disc_name = !empty($disc_name) ? " — <span class='text-body-secondary fs-6'>" . htmlspecialchars($disc_name) . "</span>" : "";
             
             echo '<div class="mt-4 mb-3 pb-2 border-bottom border-secondary-subtle">';
-            echo '<h4 class="text-info-emphasis fw-bold mb-0"><i class="fa-duotone fa-compact-disc me-2"></i>Disc ' . $disc . $display_disc_name . '</h4>';
+            echo '<h3 class="h5 text-body-emphasis fw-bold mb-0"><i class="fa-solid fa-compact-disc me-2 text-primary" aria-hidden="true"></i>Disc ' . (int)$disc . $display_disc_name . '</h3>';
             echo '</div>';
             
             echo '<div class="list-group list-group-flush bg-transparent">';
             $is_list_open = true;
         }
 
-        // ==========================================
-        // SUITE HEADER LOGIC
-        // ==========================================
+        // Suite Header Logic
         if (!empty($suite_name) && $suite_name !== $current_suite) {
             $current_suite = $suite_name;
-            echo '<div class="list-group-item bg-secondary-subtle border-start border-3 border-info py-2 mt-3 mb-1">';
-            echo '<h6 class="text-uppercase text-secondary mb-0 fw-bold"><i class="fa-solid fa-layer-group me-2"></i>' . htmlspecialchars($suite_name) . '</h6>';
+            echo '<div class="list-group-item bg-body-tertiary border-start border-3 border-primary py-2 mt-2 mb-1">';
+            echo '<h4 class="h6 text-uppercase text-body-secondary mb-0 fw-bold"><i class="fa-solid fa-layer-group me-2 text-primary" aria-hidden="true"></i>' . htmlspecialchars($suite_name) . '</h4>';
             echo '</div>';
         } elseif (empty($suite_name) && $current_suite !== null) {
-            $current_suite = null; // We've exited a suite
+            $current_suite = null;
         }
 
-        // ==========================================
-        // TRACK ROW GENERATION
-        // ==========================================
+        // Track Row Generation
         $base_name = $track['fileName'];
-        $version_string = "?v=" . time(); 
-        $lyrics_url = $base_web_path . '/lyrics/' . $base_name . '.md' . $version_string;
-        $dl_web_mp3 = $base_web_path . '/web-mp3/' . $base_name . '.mp3' . $version_string;
+        $lyrics_url = $base_web_path . '/lyrics/' . $base_name . '.md';
+        $dl_web_mp3 = $base_web_path . '/web-mp3/' . $base_name . '.mp3';
 
-        // URL Routing based on Feature Flag
         if ($vault_active) {
             $player_src = $dl_web_mp3;
-            $gateway_base = "/engine-room/api/download.php?album=" . $archive_base_name . "&track=" . $base_name;
+            $gateway_base = "/api/download.php?album=" . urlencode($archive_base_name) . "&track=" . urlencode($base_name);
             $dl_mp3 = $gateway_base . "&format=mp3";
             $dl_ogg = $gateway_base . "&format=ogg";
             $dl_wav = $gateway_base . "&format=wav";
         } else {
             $player_src = $dl_web_mp3;
-            $dl_mp3 = $base_web_path . '/vault/mp3/' . $base_name . '.mp3' . $version_string;
-            $dl_ogg = $base_web_path . '/vault/ogg/' . $base_name . '.ogg' . $version_string;
+            $dl_mp3 = $base_web_path . '/vault/mp3/' . $base_name . '.mp3';
+            $dl_ogg = $base_web_path . '/vault/ogg/' . $base_name . '.ogg';
             $dl_wav = $base_web_path . '/vault/wav/' . $base_name . '.wav'; 
         }
 
-        $legacy_tier = isset($track['legacyTier']) ? $track['legacyTier'] : null;
-        $lore_note = isset($track['loreNote']) ? $track['loreNote'] : '';
-        $duration = isset($track['duration']) ? $track['duration'] : '';
-
-        // Add to JS Playlist (SCHEMA.ORG INTEGRATION)
-        $artist_name = isset($album_data['byArtist']['name']) ? $album_data['byArtist']['name'] : 'Unknown Artist';
+        $legacy_tier = $track['legacyTier'] ?? null;
+        $lore_note = $track['loreNote'] ?? '';
+        $duration = $track['duration'] ?? '';
+        $artist_name = $album_data['byArtist']['name'] ?? 'Sample Artist';
         
         $js_playlist[] = [
             'title' => $track['title'],
@@ -368,23 +274,24 @@ $js_playlist = [];
             'lyrics' => $lyrics_url,
             'legacyTier' => $legacy_tier,
             'loreNote' => $lore_note,
-            'duration' => $duration
+            'duration' => $duration,
+            'isrc' => $isrc_code
         ];
 
-        $indent_class = !empty($current_suite) ? "ms-4 border-start-0 ps-3" : "";
+        $indent_class = !empty($current_suite) ? "ms-3 border-start-0 ps-3" : "";
         ?>
         
-        <div class="list-group-item bg-transparent border-secondary text-muted py-3 track-row <?php echo $indent_class; ?>" id="track-row-<?php echo $index; ?>" data-isrc="<?php echo htmlspecialchars($isrc_code); ?>">
+        <div class="list-group-item bg-transparent border-secondary-subtle py-3 track-row <?php echo $indent_class; ?>" id="track-row-<?php echo (int)$index; ?>" data-isrc="<?php echo htmlspecialchars($isrc_code); ?>">
             <div class="row align-items-center">
                 <div class="col-md-7 mb-2 mb-md-0">
                     <div class="d-flex align-items-center flex-wrap">
-                        <span class="text-secondary fw-bold me-3" style="width: 25px;"><?php echo $track['track']; ?>.</span>
+                        <span class="text-body-secondary fw-bold me-3" style="width: 28px;"><?php echo (int)$track['track']; ?>.</span>
                         <div>
-                            <strong class="text-body fs-5 d-inline-block me-2"><?php echo htmlspecialchars($track['title']); ?></strong>
+                            <strong class="text-body-emphasis fs-5 d-inline-block me-2"><?php echo htmlspecialchars($track['title']); ?></strong>
                             
                             <?php if (!empty($duration)): ?>
-                                <span class="text-secondary small fw-medium me-2" title="Track Length">
-                                    <i class="fa-duotone fa-clock me-1" style="--fa-primary-opacity: 0.4;"></i><?php echo htmlspecialchars($duration); ?>
+                                <span class="text-body-secondary small fw-medium me-2" title="Track Length">
+                                    <i class="fa-regular fa-clock me-1" aria-hidden="true"></i><?php echo htmlspecialchars($duration); ?>
                                 </span>
                             <?php endif; ?>
 
@@ -395,60 +302,40 @@ $js_playlist = [];
                                 if ($legacy_tier === 'Fan Anthem') $badge_class = 'bg-warning-subtle text-warning-emphasis';
                                 if ($legacy_tier === 'Deep Cut') $badge_class = 'bg-info-subtle text-info-emphasis';
                                 if ($legacy_tier === 'The Dud' || $legacy_tier === 'Studio Filler') $badge_class = 'bg-danger-subtle text-danger-emphasis';
-                                if ($legacy_tier === 'Vault Track') $badge_class = 'bg-dark text-warning border border-warning';
                                 
                                 $safe_lore_attr = htmlspecialchars($lore_note, ENT_QUOTES);
                                 $wcag_attrs = $lore_note 
-                                    ? 'title="' . $safe_lore_attr . '" aria-label="Legacy Tier: ' . htmlspecialchars($legacy_tier) . '. Lore Note: ' . $safe_lore_attr . '" tabindex="0"'
-                                    : 'aria-label="Legacy Tier: ' . htmlspecialchars($legacy_tier) . '" tabindex="0"';
+                                    ? 'title="' . $safe_lore_attr . '" aria-label="Tier: ' . htmlspecialchars($legacy_tier) . '. Note: ' . $safe_lore_attr . '" tabindex="0"'
+                                    : 'aria-label="Tier: ' . htmlspecialchars($legacy_tier) . '" tabindex="0"';
                             ?>
-                                <span class="badge <?php echo $badge_class; ?> align-text-bottom" style="font-size: 0.55em; letter-spacing: 0.5px; cursor: help;" <?php echo $wcag_attrs; ?>>
-                                    <span aria-hidden="true"><?php echo strtoupper($legacy_tier); ?></span>
+                                <span class="badge <?php echo $badge_class; ?> align-text-bottom" style="font-size: 0.65em; letter-spacing: 0.5px; cursor: help;" <?php echo $wcag_attrs; ?>>
+                                    <span aria-hidden="true"><?php echo strtoupper(htmlspecialchars($legacy_tier)); ?></span>
                                 </span>
                             <?php endif; ?>
                         </div>
                     </div>
                 </div>
 
-                <div class="col-md-5 text-end mt-2 mt-md-0">
-                    <div class="btn-group" role="group">
-                        <button type="button" class="btn btn-sm btn-primary btn-play-index" data-index="<?php echo $index; ?>"><i class="fa-duotone fa-play me-2"></i>Play</button>
-                        <button type="button" class="btn btn-sm btn-outline-info btn-view-lyrics" data-title="<?php echo htmlspecialchars($track['title']); ?>" data-url="<?php echo $lyrics_url; ?>"><i class="fa-duotone fa-book-open me-2"></i>Lyrics</button>
-                        
-                        <div class="btn-group" role="group">
-                            <?php if ($vault_active): ?>
-                                <button type="button" class="btn btn-sm btn-outline-warning dropdown-toggle" data-bs-toggle="dropdown" title="Vault Access Required"><i class="fa-solid fa-lock"></i></button>
-                            <?php else: ?>
-                                <button type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown"><i class="fa-duotone fa-download"></i></button>
-                            <?php endif; ?>
-                            
-                            <ul class="dropdown-menu dropdown-menu-end bg-dark border-secondary shadow">
-                                <li><h6 class="dropdown-header text-secondary"><i class="fa-solid fa-broadcast-tower me-1"></i> Public Stream</h6></li>
-                                <li><a class="dropdown-item text-light license-gate" download href="<?php echo $dl_web_mp3; ?>">MP3 (128kbps)</a></li>
-                                
-                                <?php if (!$vault_under_construction): ?>
-                                    <li><hr class="dropdown-divider border-secondary"></li>
-                                    <li><h6 class="dropdown-header <?php echo $vault_active ? 'text-warning' : 'text-white'; ?>"><i class="fa-solid <?php echo $vault_active ? 'fa-vault' : 'fa-compact-disc'; ?> me-1"></i> <?php echo $vault_active ? 'Premium Vault' : 'Master Tapes'; ?></h6></li>
-                                    <li><a class="dropdown-item text-light license-gate" href="<?php echo $dl_mp3; ?>">MP3 <?php echo $vault_active ? '(V0)' : '(V0)'; ?></a></li>
-                                    <li><a class="dropdown-item text-light license-gate" href="<?php echo $dl_ogg; ?>">OGG <?php echo $vault_active ? '(Q9)' : '(Q9)'; ?></a></li>
-                                    <li><hr class="dropdown-divider border-secondary"></li>
-                                    <li><a class="dropdown-item text-light license-gate" href="<?php echo $dl_wav; ?>">WAV (Lossless)</a></li>
-                                <?php endif; ?>
-                            </ul>
-                        </div>
-
+                <div class="col-md-5 text-md-end mt-2 mt-md-0">
+                    <div class="btn-group" role="group" aria-label="Controls for <?php echo htmlspecialchars($track['title']); ?>">
+                        <button type="button" class="btn btn-sm btn-primary btn-play-index px-3" data-index="<?php echo (int)$index; ?>">
+                            <i class="fa-solid fa-play me-1" aria-hidden="true"></i>Play
+                        </button>
+                        <button type="button" class="btn btn-sm btn-outline-secondary btn-view-lyrics px-3" data-title="<?php echo htmlspecialchars($track['title']); ?>" data-url="<?php echo htmlspecialchars($lyrics_url); ?>">
+                            <i class="fa-solid fa-book-open me-1" aria-hidden="true"></i>Lyrics
+                        </button>
                     </div>
                 </div>
             </div>
         </div>
     <?php endforeach; ?>
     
-    <?php if ($is_list_open) echo '</div>'; // Close final list-group ?>
+    <?php if ($is_list_open) echo '</div>'; ?>
 </div>
 
 <script>
     (function() {
-        const newPlaylist = <?php echo json_encode($js_playlist); ?>;
+        const newPlaylist = <?php echo json_encode($js_playlist, JSON_UNESCAPED_SLASHES); ?>;
         window.STARDUST_PLAYLIST = newPlaylist;
         const event = new CustomEvent('stardust:playlist-update', { detail: { playlist: newPlaylist } });
         document.dispatchEvent(event);

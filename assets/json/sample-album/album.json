@@ -1,0 +1,16 @@
+{
+  "@context": "https://schema.org",
+  "@type": "MusicAlbum",
+  "name": "Neon Horizon",
+  "byArtist": {
+    "@type": "MusicGroup",
+    "name": "Horizon Synth Collective"
+  },
+  "albumProductionType": "https://schema.org/StudioAlbum",
+  "albumReleaseType": "https://schema.org/AlbumRelease",
+  "temporalCoverage": "1989-10-14",
+  "datePublished": "2026-04-01",
+  "gtin12": "000000000000",
+  "isSequential": false,
+  "description": "A sample synthwave concept release demonstrating the Stardust Engine CMS flat-file audio player, Schema.org JSON-LD injection, and Markdown lyric rendering."
+}

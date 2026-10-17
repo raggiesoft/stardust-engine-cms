@@ -1,0 +1,40 @@
+{
+  "tracks": [
+    {
+      "track": 1,
+      "disc": 1,
+      "discName": "Side A: System Initialization",
+      "suiteName": "The Uplink Suite",
+      "title": "Orbital Handshake",
+      "fileName": "01-orbital-handshake",
+      "duration": "03:42",
+      "isrc": "US-XXX-26-00001",
+      "legacyTier": "Chart Smash",
+      "loreNote": "Demonstrates how track-level metadata badges and accessible ARIA tooltips are rendered dynamically."
+    },
+    {
+      "track": 2,
+      "disc": 1,
+      "discName": "Side A: System Initialization",
+      "suiteName": "The Uplink Suite",
+      "title": "Glass Cathedral",
+      "fileName": "02-glass-cathedral",
+      "duration": "04:18",
+      "isrc": "US-XXX-26-00002",
+      "legacyTier": "Fan Anthem",
+      "loreNote": "Demonstrates multi-track suite grouping inside a single disc."
+    },
+    {
+      "track": 3,
+      "disc": 1,
+      "discName": "Side A: System Initialization",
+      "suiteName": "",
+      "title": "Zero-Database Blues",
+      "fileName": "03-zero-database-blues",
+      "duration": "05:04",
+      "isrc": "US-XXX-26-00003",
+      "legacyTier": "Deep Cut",
+      "loreNote": "Highlights flat-file JSON routing with zero SQL overhead."
+    }
+  ]
+}

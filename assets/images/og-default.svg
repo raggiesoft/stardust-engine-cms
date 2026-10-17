@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630" role="img" aria-label="Stardust Engine CMS OpenGraph Banner">
+  <defs>
+    <linearGradient id="ogBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0b0f19"/>
+      <stop offset="50%" stop-color="#111827"/>
+      <stop offset="100%" stop-color="#1e293b"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="630" fill="url(#ogBg)"/>
+  <circle cx="600" cy="315" r="260" fill="none" stroke="#38bdf8" stroke-opacity="0.15" stroke-width="2"/>
+  <circle cx="600" cy="315" r="380" fill="none" stroke="#38bdf8" stroke-opacity="0.08" stroke-width="2"/>
+  <text x="600" y="275" text-anchor="middle" fill="#f8fafc" font-family="system-ui, -apple-system, sans-serif" font-size="64" font-weight="800" letter-spacing="4">STARDUST ENGINE CMS</text>
+  <text x="600" y="345" text-anchor="middle" fill="#38bdf8" font-family="monospace" font-size="26" font-weight="600" letter-spacing="3">ZERO-DATABASE FLAT-FILE PHP 8.5 + ELARA SPA ROUTER</text>
+  <text x="600" y="420" text-anchor="middle" fill="#94a3b8" font-family="system-ui, -apple-system, sans-serif" font-size="22">WCAG 2.1 AA Compliant • JSON Routing • Persistent Media Architecture</text>
+</svg>

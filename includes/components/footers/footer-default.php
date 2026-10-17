@@ -1,65 +1,64 @@
 <?php
 /**
- * Architectural Block Comment:
- * File: footer-default.php
- * Purpose:
- *     Serves as the generic, system-wide fallback footer for the Stardust Engine CMS.
- *     It provides standard baseline links (Home, GitHub, documentation) when a specific 
- *     theme or layout does not supply a bespoke footer.
+ * ============================================================================
+ * COMPONENT: footer-default.php
+ * CONTEXT: Default Visual Footer Component
+ *
+ * PURPOSE:
+ *     Serves as the generic, system-wide fallback visual footer for the
+ *     Stardust Engine CMS. Rendered inside `<footer id="elara-master-footer">`
+ *     by `includes/footer.php`.
  * 
- * Design Decisions & Future Maintenance:
- *     - Layout: Utilizes Bootstrap 5 grid classes (`row`, `col-lg-4`, `col-md-6`) to achieve 
- *       a responsive layout that stacks cleanly on mobile and expands into three columns on large screens.
- *     - Theming: Uses Bootstrap contextual CSS variables (`bg-body-tertiary`, `link-body-emphasis`) 
- *       to ensure it inherits the active light/dark color mode dynamically.
- *     - Accessibility: Icons are hidden from screen readers using `aria-hidden="true"`, and links 
- *       that open externally feature `target="_blank" rel="noopener noreferrer"` alongside explicit `aria-label`s.
+ * DESIGN DECISIONS & FUTURE MAINTENANCE:
+ *     - Uses a semantic `<div>` wrapper rather than a nested `<footer>` tag so
+ *       it complies strictly with HTML5 and WCAG 2.1 AA landmark specifications.
+ *     - Links directly to all working sample routes included in `/pages/projects/`.
+ * ============================================================================
  */
 ?>
-<!-- Footer wrapper with sticky auto-margin and top border -->
-<footer class="mt-auto bg-body-tertiary border-top py-5">
+<div class="bg-body-tertiary border-top py-5">
     <div class="container">
         <div class="row gy-4">
             
             <!-- Column 1: Brand & Description -->
             <div class="col-lg-4 col-md-6">
-                <!-- Branding link returning to the homepage -->
                 <a href="/" class="d-flex align-items-center mb-3 link-body-emphasis text-decoration-none">
                     <i class="fa-solid fa-rocket me-2 fs-4 text-primary" aria-hidden="true"></i>
                     <span class="fs-5 fw-bold text-uppercase brand-font">Stardust Engine</span>
                 </a>
-                <!-- Short elevator pitch for the CMS -->
-                <p class="text-body-secondary small">
-                    A blazing-fast, zero-database flat-file CMS powered by Vanilla JS routing and PHP 8.5.
+                <p class="text-body-secondary small mb-3">
+                    A blazing-fast, zero-database flat-file CMS powered by the Elara Vanilla JS SPA Router and PHP 8.5.
                 </p>
-                <!-- Slogan/sub-branding -->
-                <div class="small text-muted mt-3">
-                    <i class="fa-solid fa-microchip me-1" aria-hidden="true"></i> Built for independence.
+                <div class="small text-body-secondary">
+                    <i class="fa-solid fa-microchip me-1 text-primary" aria-hidden="true"></i> Built for speed, accessibility, and independence.
                 </div>
             </div>
 
             <!-- Column 2: Example Routing Links -->
             <div class="col-lg-4 col-md-6">
-                <h6 class="fw-bold mb-3">Example Routing</h6>
-                <ul class="nav flex-column small">
-                    <!-- Internal routes demonstrating the flat-file structure -->
-                    <li class="nav-item mb-2"><a href="/project" class="nav-link p-0 text-body-secondary">Project Overview</a></li>
-                    <li class="nav-item mb-2"><a href="/project/about" class="nav-link p-0 text-body-secondary">About the Architecture</a></li>
-                    <li class="nav-item mb-2"><a href="/project/portfolio" class="nav-link p-0 text-body-secondary">Portfolio Examples</a></li>
+                <h2 class="h6 fw-bold text-uppercase mb-3">Included Demo Routes</h2>
+                <ul class="nav flex-column small gap-2">
+                    <li class="nav-item"><a href="/project" class="nav-link p-0 text-body-secondary">Project Overview (DRY Inheritance)</a></li>
+                    <li class="nav-item"><a href="/project/about" class="nav-link p-0 text-body-secondary">About Page (Layout Override)</a></li>
+                    <li class="nav-item"><a href="/project/album-releases" class="nav-link p-0 text-body-secondary">Audio Player &amp; Tracklist Showcase</a></li>
+                    <li class="nav-item"><a href="/project/radio" class="nav-link p-0 text-body-secondary">Radio Stream &amp; Markdown Parser</a></li>
+                    <li class="nav-item"><a href="/project/dynamic-directory" class="nav-link p-0 text-body-secondary">Dynamic Directory Auto-Indexer</a></li>
                 </ul>
             </div>
 
             <!-- Column 3: External Resources & Socials -->
-            <div class="col-lg-4 col-md-6 text-md-end">
-                <h6 class="fw-bold mb-3">Resources & Connect</h6>
-                <div class="d-flex justify-content-md-end gap-3">
-                    <!-- GitHub Repository Link -->
-                    <a href="https://github.com/raggiesoft/stardust-engine-cms" target="_blank" rel="noopener noreferrer" class="link-secondary fs-5" aria-label="GitHub Repository">
-                        <i class="fa-brands fa-github"></i>
+            <div class="col-lg-4 col-md-12 text-lg-end">
+                <h2 class="h6 fw-bold text-uppercase mb-3">Developer Resources</h2>
+                <p class="small text-body-secondary mb-3">
+                    Explore the route schema in <code>/data/routes/routes.json</code> or customize global settings in <code>/data/settings.json</code>.
+                </p>
+                <div class="d-flex justify-content-lg-end gap-2">
+                    <a href="https://github.com/raggiesoft/stardust-engine-cms" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-outline-secondary rounded-pill px-3" aria-label="View Stardust Engine CMS on GitHub">
+                        <i class="fa-brands fa-github me-1" aria-hidden="true"></i>GitHub Repository
                     </a>
                 </div>
             </div>
             
         </div>
     </div>
-</footer>
+</div>

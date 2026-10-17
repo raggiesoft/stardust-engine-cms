@@ -1,0 +1,67 @@
+{
+  "common": {
+    "site": "stardust-engine-cms",
+    "theme": "light",
+    "brandFont": ["system-ui", "-apple-system", "sans-serif"],
+    "siteName": "Stardust Engine CMS",
+    "headerMenu": "header-default",
+    "footer": "footer-default",
+    "showSidebar": true,
+    "sidebar": "sidebar-default",
+    "navbarBrandText": "Stardust Engine",
+    "navbarBrandLink": "/",
+    "ogImage": "/assets/images/og-default.svg"
+  },
+
+  "/": {
+    "view": "pages/home",
+    "title": "Home | Stardust Engine CMS",
+    "ogTitle": "Stardust Engine CMS — Zero-Database Flat-File PHP 8.5 + Elara SPA",
+    "ogDescription": "A blazing-fast, zero-database flat-file CMS powered by PHP 8.5 and the Elara Vanilla JS SPA Router.",
+    "showSidebar": false
+  },
+
+  "/project": {
+    "view": "pages/projects/overview",
+    "title": "Project Overview | Stardust Engine CMS",
+    "ogTitle": "Project Overview & Route Inheritance | Stardust Engine CMS",
+    "ogDescription": "Explore how JSON route inheritance shares headers, sidebars, and themes across directories."
+  },
+
+  "/project/about": {
+    "view": "pages/projects/about/overview",
+    "title": "About the Architecture | Stardust Engine CMS",
+    "ogTitle": "About the Stardust Engine Architecture",
+    "ogDescription": "Learn how child routes can override parent layout blocks in the Stardust Engine CMS.",
+    "sidebar": false,
+    "showSidebar": false
+  },
+
+  "/project/album-releases": {
+    "view": "pages/projects/album-releases",
+    "title": "Neon Horizon (Audio Demo) | Stardust Engine CMS",
+    "ogTitle": "Persistent Audio Player & Tracklist Demo | Stardust Engine CMS",
+    "ogDescription": "Interactive demonstration of the persistent Sticky Audio Player, Markdown lyrics modal, and DSP store selector."
+  },
+
+  "/project/radio": {
+    "view": "pages/projects/radio",
+    "title": "Global Radio Console | Stardust Engine CMS",
+    "ogTitle": "Global Radio Aggregator Demo | Stardust Engine CMS",
+    "ogDescription": "Multi-catalog JSON playlist aggregation, ISRC deduplication, and smart album shuffling."
+  },
+
+  "/project/dynamic-directory": {
+    "view": "pages/projects/dynamic-directory",
+    "title": "Dynamic Directory | Stardust Engine CMS",
+    "ogTitle": "Query Parameter Routing Demo | Stardust Engine CMS",
+    "ogDescription": "Demonstrates $_GET query string parameter transitions inside the Elara SPA router."
+  },
+
+  "/project/secret-page": {
+    "view": "pages/projects/literally-any-name",
+    "title": "Decoupled Architecture | Stardust Engine CMS",
+    "ogTitle": "Decoupled Route Mapping | Stardust Engine CMS",
+    "ogDescription": "Demonstrating how clean semantic URLs detach from physical PHP view filenames."
+  }
+}
