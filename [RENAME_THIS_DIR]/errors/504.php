@@ -55,3 +55,4 @@ if ($is_standalone) {
     require_once ROOT_PATH . '/includes/footer.php';
 }
 ?>
+

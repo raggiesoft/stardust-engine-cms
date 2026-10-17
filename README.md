@@ -113,3 +113,25 @@ When deploying to a production Nginx server:
 ## 📄 License
 
 Released under the **MIT License**. See [`LICENSE`](LICENSE) for full details.
+```
+
+---
+
+## 🔒 Production Deployment (Nginx + PHP 8.5-FPM)
+
+When deploying to a production Nginx server:
+1. **Rename the Router Directory & File**: For security-in-depth against automated bot scanners, rename `[RENAME_THIS_DIR]` and `[RENAME_THIS_ROUTER].php` to your own custom names (for example, `_core/engine.php`).
+2. **Configure Nginx**: Copy `nginx.conf.example` to `/etc/nginx/sites-available/your-site.conf` and update the `index`, `try_files`, and `error_page` directives to match your renamed directory and router file:
+   ```nginx
+   location / {
+       try_files $uri $uri/ /_core/engine.php?$query_string;
+   }
+   ```
+3. **Optional Custom Icon Kits**: Out of the box, `includes/header.php` loads **Bootstrap 5.3.8**, **Bootstrap Icons 1.11.3**, and **Font Awesome Free 6.7.2** from public CDNs. If you have a custom Font Awesome Pro or Web Awesome kit URL, add it to `fontAwesomeKit` or `webAwesomeKit` in `data/settings.json`.
+
+---
+
+## 📄 License
+
+Released under the **MIT License**. See [`LICENSE`](LICENSE) for full details.
+└── README.md

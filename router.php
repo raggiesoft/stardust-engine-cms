@@ -36,3 +36,4 @@ if ($uri !== '/' && is_file($requestedFile) && !str_ends_with(strtolower($reques
 
 // 3. Delegate all application routes to the core Stardust Engine front-controller
 require __DIR__ . '/[RENAME_THIS_DIR]/[RENAME_THIS_ROUTER].php';
+
